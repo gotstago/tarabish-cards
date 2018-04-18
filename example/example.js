@@ -39,6 +39,155 @@ $topbar.appendChild($easter)
 
 var deck = Deck()
 
+
+
+$shuffle.addEventListener('click', function () {
+  deck.shuffle()
+  deck.shuffle()
+})
+$sort.addEventListener('click', function () {
+  deck.sort()
+})
+$bysuit.addEventListener('click', function () {
+  deck.sort(true) // sort reversed
+  deck.bysuit()
+})
+$fan.addEventListener('click', function () {
+  deck.fan()
+})
+$flip.addEventListener('click', function () {
+  deck.flip()
+})
+$easter.addEventListener('click', function () {
+  setTimeout(function () {
+    startWinning()
+  }, 250)
+})
+$poker.addEventListener('click', function () {
+  deck.queue(function (next) {
+    deck.cards.forEach(function (card, i) {
+      setTimeout(function () {
+        card.setSide('back')
+      }, i * 7.5)
+    })
+    next()
+  })
+  deck.shuffle()
+  deck.shuffle()
+  deck.poker()
+})
+
+$tarabish.addEventListener('click', function () {
+  // Remove the 2,3,4,5 of each suit card from deck
+  var cards = deck.cards
+  var removedCards = cards.splice(8, 4);
+  removedCards.forEach(function (removedCard) {
+    removedCard.unmount();
+  });
+  removedCards = cards.splice(17, 4);
+  removedCards.forEach(function (removedCard) {
+    removedCard.unmount();
+  });
+  removedCards = cards.splice(26, 4);
+  removedCards.forEach(function (removedCard) {
+    removedCard.unmount();
+  });
+  removedCards = cards.splice(35, 4);
+  removedCards.forEach(function (removedCard) {
+    removedCard.unmount();
+  });
+  deck.queue(function (next) {
+    cards.forEach(function (card, i) {//turn over all cards with a small delay between each
+      setTimeout(function () {
+        card.setSide('back')
+      }, i * 7.5)
+    })
+    next()
+  })
+  deck.shuffle()
+  deck.shuffle()
+  //deck.tarabish();
+  var len = cards.length
+  deck.dealSouthBidCards(-3,len)
+  deck.dealWestBidCards(-6, -3)
+  deck.dealSouthBidCards(-9,-6)
+  deck.dealWestBidCards(-12, -9)
+  
+})
+
+deck.mount($container)
+
+deck.intro()
+deck.sort()
+
+// secret message..
+
+var randomDelay = 10000 + 30000 * Math.random()
+
+// setTimeout(function () {
+//   printMessage('Psst..I want to share a secret with you...')
+// }, randomDelay)
+
+// setTimeout(function () {
+//   printMessage('...try clicking all kings and nothing in between...')
+// }, randomDelay + 5000)
+
+// setTimeout(function () {
+//   printMessage('...have fun ;)')
+// }, randomDelay + 10000)
+
+// function tarabish(i, len, cb) {
+//   var delay = i * 250
+
+//   card.animateTo({
+//     delay: delay,
+//     duration: 250,
+
+//     x: Math.round((i - 2.05) * 70 * fontSize / 16),
+//     y: Math.round(-110 * fontSize / 16),
+//     rot: 0,
+
+//     onStart: function () {
+//       $el.style.zIndex = (len - 1) + i
+//     },
+//     onComplete: function () {
+//       cb(i)
+//     }
+//   })
+// }
+
+function printMessage(text) {
+  var animationFrames = Deck.animationFrames
+  var ease = Deck.ease
+  var $message = document.createElement('p')
+  $message.classList.add('message')
+  $message.textContent = text
+
+  document.body.appendChild($message)
+
+  $message.style[transform] = translate(window.innerWidth + 'px', 0)
+
+  var diffX = window.innerWidth
+
+  animationFrames(1000, 700)
+    .progress(function (t) {
+      t = ease.cubicInOut(t)
+      $message.style[transform] = translate((diffX - diffX * t) + 'px', 0)
+    })
+
+  animationFrames(6000, 700)
+    .start(function () {
+      diffX = window.innerWidth
+    })
+    .progress(function (t) {
+      t = ease.cubicInOut(t)
+      $message.style[transform] = translate((-diffX * t) + 'px', 0)
+    })
+    .end(function () {
+      document.body.removeChild($message)
+    })
+}
+
 // easter eggs start
 
 var acesClicked = []
@@ -152,144 +301,3 @@ function addWinningCard($deck, i, side) {
 }
 
 // easter eggs end
-
-$shuffle.addEventListener('click', function () {
-  deck.shuffle()
-  deck.shuffle()
-})
-$sort.addEventListener('click', function () {
-  deck.sort()
-})
-$bysuit.addEventListener('click', function () {
-  deck.sort(true) // sort reversed
-  deck.bysuit()
-})
-$fan.addEventListener('click', function () {
-  deck.fan()
-})
-$flip.addEventListener('click', function () {
-  deck.flip()
-})
-$easter.addEventListener('click', function () {
-  setTimeout(function () {
-    startWinning()
-  }, 250)
-})
-$poker.addEventListener('click', function () {
-  deck.queue(function (next) {
-    deck.cards.forEach(function (card, i) {
-      setTimeout(function () {
-        card.setSide('back')
-      }, i * 7.5)
-    })
-    next()
-  })
-  deck.shuffle()
-  deck.shuffle()
-  deck.poker()
-})
-
-$tarabish.addEventListener('click', function () {
-  // Remove the 2,3,4,5 of each suit card from deck
-  var cards = deck.cards
-  var removedCards = cards.splice(8, 4);
-  removedCards.forEach(function (removedCard) {
-    removedCard.unmount();
-  });
-  removedCards = cards.splice(17, 4);
-  removedCards.forEach(function (removedCard) {
-    removedCard.unmount();
-  });
-  removedCards = cards.splice(26, 4);
-  removedCards.forEach(function (removedCard) {
-    removedCard.unmount();
-  });
-  removedCards = cards.splice(35, 4);
-  removedCards.forEach(function (removedCard) {
-    removedCard.unmount();
-  });
-  deck.queue(function (next) {
-    cards.forEach(function (card, i) {//turn over all cards with a small delay between each
-      setTimeout(function () {
-        card.setSide('back')
-      }, i * 7.5)
-    })
-    next()
-  })
-  deck.shuffle()
-  deck.shuffle()
-  deck.tarabish();
-})
-
-deck.mount($container)
-
-deck.intro()
-deck.sort()
-
-// secret message..
-
-var randomDelay = 10000 + 30000 * Math.random()
-
-// setTimeout(function () {
-//   printMessage('Psst..I want to share a secret with you...')
-// }, randomDelay)
-
-// setTimeout(function () {
-//   printMessage('...try clicking all kings and nothing in between...')
-// }, randomDelay + 5000)
-
-// setTimeout(function () {
-//   printMessage('...have fun ;)')
-// }, randomDelay + 10000)
-
-// function tarabish(i, len, cb) {
-//   var delay = i * 250
-
-//   card.animateTo({
-//     delay: delay,
-//     duration: 250,
-
-//     x: Math.round((i - 2.05) * 70 * fontSize / 16),
-//     y: Math.round(-110 * fontSize / 16),
-//     rot: 0,
-
-//     onStart: function () {
-//       $el.style.zIndex = (len - 1) + i
-//     },
-//     onComplete: function () {
-//       cb(i)
-//     }
-//   })
-// }
-
-function printMessage(text) {
-  var animationFrames = Deck.animationFrames
-  var ease = Deck.ease
-  var $message = document.createElement('p')
-  $message.classList.add('message')
-  $message.textContent = text
-
-  document.body.appendChild($message)
-
-  $message.style[transform] = translate(window.innerWidth + 'px', 0)
-
-  var diffX = window.innerWidth
-
-  animationFrames(1000, 700)
-    .progress(function (t) {
-      t = ease.cubicInOut(t)
-      $message.style[transform] = translate((diffX - diffX * t) + 'px', 0)
-    })
-
-  animationFrames(6000, 700)
-    .start(function () {
-      diffX = window.innerWidth
-    })
-    .progress(function (t) {
-      t = ease.cubicInOut(t)
-      $message.style[transform] = translate((-diffX * t) + 'px', 0)
-    })
-    .end(function () {
-      document.body.removeChild($message)
-    })
-}

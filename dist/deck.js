@@ -615,18 +615,56 @@ var Deck = (function () {
 
   var tarabish = {
     deck: function deck(_deck4) {
-      _deck4.tarabish = _deck4.queued(tarabish);
+      //assign deck a new function after queueing
+      // deck.dealBidCards = deck.queued(dealBidCards)
 
-      function tarabish(next) {
+      // function dealBidCards() {
+      //   // var cards = deck.cards
+      //   // var len = cards.length
+
+      //   // fontSize = getFontSize()
+
+      //   // cards.slice(-9).reverse().forEach(function (card, i) {
+      //   //   card.south(i, len, function (i) {
+      //   //     card.setSide('front')
+      //   //     if (i === 8) {
+      //   //       next()
+      //   //     }
+      //   //   })
+      //   // })
+      //   dealSouthBidCards()
+      // }
+
+      _deck4.dealSouthBidCards = _deck4.queued(dealSouthBidCards);
+
+      function dealSouthBidCards(next, beg, end) {
+        var cards = _deck4.cards;
+        var len = cards.length;
+
+        ___fontSize = fontSize();
+        _deck4.southCards = _deck4.southCards | [];
+        _deck4.southCards.push(cards.slice(beg, end));
+        _deck4.southCards.reverse().forEach(function (card, i) {
+          card.south(i, len, function (i) {
+            card.setSide('front');
+            if (i === _deck4.southCards.length - 1) {
+              next();
+            }
+          });
+        });
+      }
+      _deck4.dealWestBidCards = _deck4.queued(dealWestBidCards);
+
+      function dealWestBidCards(next, beg, end) {
         var cards = _deck4.cards;
         var len = cards.length;
 
         ___fontSize = fontSize();
 
-        cards.slice(-9).reverse().forEach(function (card, i) {
-          card.tarabish(i, len, function (i) {
-            card.setSide('front');
-            if (i === 8) {
+        cards.slice(beg, end).reverse().forEach(function (card, i) {
+          card.west(i, len, function (i) {
+            card.setSide('back');
+            if (i === 2) {
               next();
             }
           });
@@ -636,7 +674,7 @@ var Deck = (function () {
     card: function card(_card4) {
       var $el = _card4.$el;
 
-      _card4.tarabish = function (i, len, cb) {
+      _card4.south = function (i, len, cb) {
         var delay = i * 250;
 
         _card4.animateTo({
@@ -645,6 +683,25 @@ var Deck = (function () {
 
           x: Math.round((i - 5.05) * 20 * ___fontSize / 16),
           y: Math.round(-110 * ___fontSize / 16),
+          rot: 0,
+
+          onStart: function onStart() {
+            $el.style.zIndex = len - 1 + i;
+          },
+          onComplete: function onComplete() {
+            cb(i);
+          }
+        });
+      };
+      _card4.west = function (i, len, cb) {
+        var delay = i * 250;
+
+        _card4.animateTo({
+          delay: delay,
+          duration: 250,
+
+          x: Math.round((i - 10.05) * 20 * ___fontSize / 16),
+          y: Math.round(-210 * ___fontSize / 16),
           rot: 0,
 
           onStart: function onStart() {
