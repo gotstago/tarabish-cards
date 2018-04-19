@@ -642,13 +642,13 @@ var Deck = (function () {
         var len = cards.length;
 
         ___fontSize = fontSize();
-        _deck4.southCards = _deck4.southCards || [];
-        _deck4.southCards.concat(cards.slice(beg, end));
-        _deck4.southCards.reverse().forEach(function (card, i) {
+        // deck.southCards = deck.southCards || [];
+        // deck.southCards.concat(cards.slice(beg, end))
+        cards.slice(beg, end).reverse().forEach(function (card, i) {
           console.log('card is' + card);
           card.south(i, len, function (i) {
             card.setSide('front');
-            if (i === _deck4.southCards.length - 1) {
+            if (i === 2) {
               next();
             }
           });
@@ -683,7 +683,7 @@ var Deck = (function () {
           duration: 250,
 
           x: Math.round((i - 5.05) * 20 * ___fontSize / 16),
-          y: Math.round(-110 * ___fontSize / 16),
+          y: Math.round(110 * ___fontSize / 16),
           rot: 0,
 
           onStart: function onStart() {
