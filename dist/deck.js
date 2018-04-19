@@ -642,9 +642,10 @@ var Deck = (function () {
         var len = cards.length;
 
         ___fontSize = fontSize();
-        _deck4.southCards = _deck4.southCards | [];
-        _deck4.southCards.push(cards.slice(beg, end));
+        _deck4.southCards = _deck4.southCards || [];
+        _deck4.southCards.concat(cards.slice(beg, end));
         _deck4.southCards.reverse().forEach(function (card, i) {
+          console.log('card is' + card);
           card.south(i, len, function (i) {
             card.setSide('front');
             if (i === _deck4.southCards.length - 1) {
