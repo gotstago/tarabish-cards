@@ -635,6 +635,25 @@ var Deck = (function () {
       //   dealSouthBidCards()
       // }
 
+      _deck4.dealNorthBidCards = _deck4.queued(dealNorthBidCards);
+
+      function dealNorthBidCards(next, beg, end) {
+        var cards = _deck4.cards;
+        var len = cards.length;
+
+        ___fontSize = fontSize();
+        // deck.southCards = deck.southCards || [];
+        // deck.southCards.concat(cards.slice(beg, end))
+        cards.slice(beg, end).reverse().forEach(function (card, i) {
+          //console.log(`card is${card}`);
+          card.north(i, len, function (i) {
+            card.setSide('back');
+            if (i === 2) {
+              next();
+            }
+          });
+        });
+      }
       _deck4.dealSouthBidCards = _deck4.queued(dealSouthBidCards);
 
       function dealSouthBidCards(next, beg, end) {
@@ -645,7 +664,7 @@ var Deck = (function () {
         // deck.southCards = deck.southCards || [];
         // deck.southCards.concat(cards.slice(beg, end))
         cards.slice(beg, end).reverse().forEach(function (card, i) {
-          console.log('card is' + card);
+          //console.log(`card is${card}`);
           card.south(i, len, function (i) {
             card.setSide('front');
             if (i === 2) {
@@ -671,6 +690,23 @@ var Deck = (function () {
           });
         });
       }
+      _deck4.dealEastBidCards = _deck4.queued(dealEastBidCards);
+
+      function dealEastBidCards(next, beg, end) {
+        var cards = _deck4.cards;
+        var len = cards.length;
+
+        ___fontSize = fontSize();
+
+        cards.slice(beg, end).reverse().forEach(function (card, i) {
+          card.east(i, len, function (i) {
+            card.setSide('back');
+            if (i === 2) {
+              next();
+            }
+          });
+        });
+      }
     },
     card: function card(_card4) {
       var $el = _card4.$el;
@@ -682,8 +718,27 @@ var Deck = (function () {
           delay: delay,
           duration: 250,
 
-          x: Math.round((i - 5.05) * 20 * ___fontSize / 16),
+          x: Math.round((i - 1.05) * 20 * ___fontSize / 16),
           y: Math.round(110 * ___fontSize / 16),
+          rot: 0,
+
+          onStart: function onStart() {
+            $el.style.zIndex = len - 1 + i;
+          },
+          onComplete: function onComplete() {
+            cb(i);
+          }
+        });
+      };
+      _card4.north = function (i, len, cb) {
+        var delay = i * 250;
+
+        _card4.animateTo({
+          delay: delay,
+          duration: 250,
+
+          x: Math.round((i - 1.05) * 20 * ___fontSize / 16),
+          y: Math.round(-110 * ___fontSize / 16),
           rot: 0,
 
           onStart: function onStart() {
@@ -701,9 +756,28 @@ var Deck = (function () {
           delay: delay,
           duration: 250,
 
-          x: Math.round((i - 10.05) * 20 * ___fontSize / 16),
-          y: Math.round(-210 * ___fontSize / 16),
-          rot: 0,
+          y: Math.round((i - 1.05) * 20 * ___fontSize / 16),
+          x: Math.round(-150 * ___fontSize / 16),
+          rot: 90,
+
+          onStart: function onStart() {
+            $el.style.zIndex = len - 1 + i;
+          },
+          onComplete: function onComplete() {
+            cb(i);
+          }
+        });
+      };
+      _card4.east = function (i, len, cb) {
+        var delay = i * 250;
+
+        _card4.animateTo({
+          delay: delay,
+          duration: 250,
+
+          y: Math.round((i - 1.05) * 20 * ___fontSize / 16),
+          x: Math.round(150 * ___fontSize / 16),
+          rot: 90,
 
           onStart: function onStart() {
             $el.style.zIndex = len - 1 + i;

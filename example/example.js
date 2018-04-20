@@ -110,8 +110,8 @@ $tarabish.addEventListener('click', function () {
   var len = cards.length
   deck.dealSouthBidCards(-3,len)
   deck.dealWestBidCards(-6, -3)
-  deck.dealSouthBidCards(-9,-6)
-  deck.dealWestBidCards(-12, -9)
+  deck.dealNorthBidCards(-9,-6)
+  deck.dealEastBidCards(-12, -9)
   
 })
 
