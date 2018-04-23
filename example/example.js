@@ -107,11 +107,14 @@ $tarabish.addEventListener('click', function () {
   deck.shuffle()
   deck.shuffle()
   //deck.tarabish();
-  var len = cards.length
-  deck.dealSouthBidCards(-3,len)
-  deck.dealWestBidCards(-6, -3)
-  deck.dealNorthBidCards(-9,-6)
-  deck.dealEastBidCards(-12, -9)
+  // var len = cards.length
+  deck.tarabish(0)
+  console.log('here ...')
+  //deck.test(0)
+  // deck.dealSouthBidCards(-3,cards.length)
+  // deck.dealWestBidCards(-6, -3)
+  // deck.dealNorthBidCards(-9,-6)
+  // deck.dealEastBidCards(-12, -9)
   
 })
 

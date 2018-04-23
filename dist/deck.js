@@ -612,28 +612,69 @@ var Deck = (function () {
   };
 
   var ___fontSize;
+  var west;
 
   var tarabish = {
     deck: function deck(_deck4) {
       //assign deck a new function after queueing
-      // deck.dealBidCards = deck.queued(dealBidCards)
+      ___fontSize = fontSize();
+      _deck4.tarabish = _deck4.queued(tarabish);
+      west = {
+        begOne: -6,
+        endOne: -3,
+        side: 'back',
+        getY: function getY(idx, fs) {
+          return Math.round((idx - 1.05) * 20 * fs / 16);
+        },
+        getX: function getX(idx, fs) {
+          return Math.round(-150 * fs / 16);
+        }
 
-      // function dealBidCards() {
-      //   // var cards = deck.cards
-      //   // var len = cards.length
+      };
+      function tarabish(next, dealer) {
+        var cards = _deck4.cards;
+        // var len = cards.length
 
-      //   // fontSize = getFontSize()
+        // fontSize = getFontSize()
 
-      //   // cards.slice(-9).reverse().forEach(function (card, i) {
-      //   //   card.south(i, len, function (i) {
-      //   //     card.setSide('front')
-      //   //     if (i === 8) {
-      //   //       next()
-      //   //     }
-      //   //   })
-      //   // })
-      //   dealSouthBidCards()
-      // }
+        // cards.slice(-9).reverse().forEach(function (card, i) {
+        //   card.south(i, len, function (i) {
+        //     card.setSide('front')
+        //     if (i === 8) {
+        //       next()
+        //     }
+        //   })
+        // })
+        // dealSouthBidCards()
+        console.log('Dealer is ' + dealer);
+        //deck.dealBidCards(-3,cards.length)
+        _deck4.dealBidCards(west);
+        next();
+      }
+      _deck4.dealBidCards = _deck4.queued(dealBidCards);
+
+      function dealBidCards(next, pos) {
+        var cards = _deck4.cards;
+        var len = cards.length;
+
+        ___fontSize = fontSize();
+
+        cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
+          card.dealBidCards(pos, i, len, function (i) {
+            card.setSide(pos.side);
+            if (i === 2) {
+              next();
+            }
+          });
+        });
+      }
+
+      _deck4.test = _deck4.queued(test);
+
+      function test(next, dealer) {
+        console.log('test is ' + dealer);
+        next();
+      }
 
       _deck4.dealNorthBidCards = _deck4.queued(dealNorthBidCards);
 
@@ -711,6 +752,25 @@ var Deck = (function () {
     card: function card(_card4) {
       var $el = _card4.$el;
 
+      _card4.dealBidCards = function (pos, i, len, cb) {
+        var delay = i * 250;
+
+        _card4.animateTo({
+          delay: delay,
+          duration: 250,
+
+          y: pos.getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
+          x: pos.getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
+          rot: 90,
+
+          onStart: function onStart() {
+            $el.style.zIndex = len - 1 + i;
+          },
+          onComplete: function onComplete() {
+            cb(i);
+          }
+        });
+      };
       _card4.south = function (i, len, cb) {
         var delay = i * 250;
 
