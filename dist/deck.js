@@ -612,27 +612,45 @@ var Deck = (function () {
   };
 
   var ___fontSize;
-  var west;
+  var positions;
+  var cards;
 
   var tarabish = {
     deck: function deck(_deck4) {
       //assign deck a new function after queueing
       ___fontSize = fontSize();
-      _deck4.tarabish = _deck4.queued(tarabish);
-      west = {
-        begOne: -6,
-        endOne: -3,
-        side: 'back',
-        getY: function getY(idx, fs) {
-          return Math.round((idx - 1.05) * 20 * fs / 16);
+      cards = _deck4.cards;
+      var len = cards.length;
+      console.log('cards length is ' + len);
+      positions = {
+        west: {
+          begOne: -6,
+          endOne: -3,
+          side: 'back',
+          getY: function getY(idx, fs) {
+            return Math.round((idx - 1.05) * 20 * fs / 16);
+          },
+          getX: function getX(idx, fs) {
+            return Math.round(-150 * fs / 16);
+          }
         },
-        getX: function getX(idx, fs) {
-          return Math.round(-150 * fs / 16);
+        east: {
+          begOne: -6,
+          endOne: -3,
+          side: 'back',
+          getY: function getY(idx, fs) {
+            return Math.round((idx - 1.05) * 20 * fs / 16);
+          },
+          getX: function getX(idx, fs) {
+            return Math.round(-150 * fs / 16);
+          }
         }
-
       };
+
+      _deck4.tarabish = _deck4.queued(tarabish);
+
       function tarabish(next, dealer) {
-        var cards = _deck4.cards;
+        //var cards = deck.cards
         // var len = cards.length
 
         // fontSize = getFontSize()
@@ -646,15 +664,24 @@ var Deck = (function () {
         //   })
         // })
         // dealSouthBidCards()
-        console.log('Dealer is ' + dealer);
+        var myArry = ["west", "north", "east", "south"];
+        var offset = Math.floor(Math.random() * 4); //3;
+        var dealer = myArry[offset];
+        console.log('dealer is ' + dealer);
+        for (var i = 0; i < myArry.length; i++) {
+          var pointer = (i + offset + 1) % myArry.length;
+          console.log(myArry[pointer]);
+        }
+
+        console.log('Dealer is ' + dealer + ' and position is ' + positions.west);
         //deck.dealBidCards(-3,cards.length)
-        _deck4.dealBidCards(west);
+        _deck4.dealBidCards(positions.west);
         next();
       }
       _deck4.dealBidCards = _deck4.queued(dealBidCards);
 
       function dealBidCards(next, pos) {
-        var cards = _deck4.cards;
+        //var cards = deck.cards
         var len = cards.length;
 
         ___fontSize = fontSize();
