@@ -675,24 +675,56 @@ var Deck = (function () {
 
         console.log('Dealer is ' + dealer + ' and position is ' + positions.west);
         //deck.dealBidCards(-3,cards.length)
-        _deck4.dealBidCards(positions.west);
+        dealBidCards(positions.west);
+
         next();
       }
-      _deck4.dealBidCards = _deck4.queued(dealBidCards);
+      // deck.dealBidCards = deck.queued(dealBidCards)
 
-      function dealBidCards(next, pos) {
+      function dealBidCards(pos) {
         //var cards = deck.cards
         var len = cards.length;
 
         ___fontSize = fontSize();
+        // Promise.resolve(cards).then(function (result) {
+        //   return Promise.all(result.map(function (card, i) {
+        //     return Promise.resolve(card.dealBidCard(pos, i, len).then(Promise.resolve(function (i) {
+        //       card.setSide(pos.side)
+        //       if (i === 2) {
+        //         // next()
+        //         console.log('returning from callback')
+        //         //return Promise.resolve(i);
+        //       }
 
-        cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
-          card.dealBidCards(pos, i, len, function (i) {
+        //     })))
+        //   }));
+        // }).then(function (arrayOfResults) {
+        //   // All docs have really been removed() now!
+        //   console.log(`result here...${arrayOfResults}`)
+        // });
+        var cb = function cb(i, card) {
+          return new Promise(function (resolve, reject) {
             card.setSide(pos.side);
             if (i === 2) {
-              next();
+              // next()
+              console.log('returning from callback');
+              resolve(i);
             }
           });
+        };
+        var failureCallback = function failureCallback(err) {
+          console.log('finished...error is ' + err);
+        };
+        cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
+          var deal = function deal(pos, i, len) {
+            return new Promise(function (resolve) {
+              return card.dealBidCard(pos, i, len, resolve);
+            });
+          };
+          deal(pos, i, len).then(function () {
+            return cb(i, card);
+          })['catch'](failureCallback);
+          //card.dealBidCard(pos, i, len, cb)
         });
       }
 
@@ -779,7 +811,7 @@ var Deck = (function () {
     card: function card(_card4) {
       var $el = _card4.$el;
 
-      _card4.dealBidCards = function (pos, i, len, cb) {
+      _card4.dealBidCard = function (pos, i, len, cb) {
         var delay = i * 250;
 
         _card4.animateTo({
