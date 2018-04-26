@@ -632,20 +632,52 @@ var Deck = (function () {
           },
           getX: function getX(idx, fs) {
             return Math.round(-150 * fs / 16);
-          }
+          },
+          nextPosition: 'north',
+          rot: 90
+        },
+        north: {
+          begOne: -9,
+          endOne: -6,
+          side: 'back',
+          getY: function getY(idx, fs) {
+            return Math.round(-110 * fs / 16);
+          },
+          getX: function getX(idx, fs) {
+            return Math.round((idx - 1.05) * 20 * fs / 16);
+          },
+          nextPosition: 'east',
+          rot: 0
         },
         east: {
-          begOne: -6,
-          endOne: -3,
+          begOne: -12,
+          endOne: -9,
           side: 'back',
           getY: function getY(idx, fs) {
             return Math.round((idx - 1.05) * 20 * fs / 16);
           },
           getX: function getX(idx, fs) {
-            return Math.round(-150 * fs / 16);
-          }
+            return Math.round(150 * fs / 16);
+          },
+          nextPosition: 'south',
+          rot: 90
+        },
+        south: {
+          begOne: -15,
+          endOne: -12,
+          side: 'front',
+          getY: function getY(idx, fs) {
+            return Math.round(110 * fs / 16);
+          },
+          getX: function getX(idx, fs) {
+            return Math.round((idx - 1.05) * 20 * fs / 16);
+          },
+          nextPosition: 'west',
+          rot: 0
         }
       };
+      // x: Math.round((i - 1.05) * 20 * fontSize / 16),
+      // y: Math.round(-110 * fontSize / 16),
 
       _deck4.tarabish = _deck4.queued(tarabish);
 
@@ -675,13 +707,48 @@ var Deck = (function () {
 
         console.log('Dealer is ' + dealer + ' and position is ' + positions.west);
         //deck.dealBidCards(-3,cards.length)
-        dealBidCards(positions.west);
+        // dealBidCards(positions.west)
 
-        next();
+        // next()
+        Promise.resolve(positions.west).then(function (result) {
+          return dealBidCards(result);
+        }).then(function (nextPos) {
+          return dealBidCards(positions[nextPos]);
+        }).then(function (nextPos) {
+          return dealBidCards(positions[nextPos]);
+        }).then(function (nextPos) {
+          return dealBidCards(positions[nextPos]);
+        }).then(function (finalResult) {
+          console.log('Got the final result: ' + finalResult);
+          next();
+        })['catch'](function (err) {
+          console.log('Got an error : ' + err);
+        });
       }
       // deck.dealBidCards = deck.queued(dealBidCards)
-
       function dealBidCards(pos) {
+        console.log('begin dealBidCards...');
+        return new Promise(function (resolve, reject) {
+          //var cards = deck.cards
+          var len = cards.length;
+
+          ___fontSize = fontSize();
+          // deck.southCards = deck.southCards || [];
+          // deck.southCards.concat(cards.slice(beg, end))
+          cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
+            //console.log(`card is${card}`);
+            card.dealBidCard(pos, i, len, function (i) {
+              card.setSide(pos.side);
+              if (i === 2) {
+                //next()
+                resolve(pos.nextPosition);
+              }
+            });
+          });
+        });
+      }
+
+      function dealBidCardsOld(pos) {
         //var cards = deck.cards
         var len = cards.length;
 
@@ -820,7 +887,7 @@ var Deck = (function () {
 
           y: pos.getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
           x: pos.getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
-          rot: 90,
+          rot: pos.rot,
 
           onStart: function onStart() {
             $el.style.zIndex = len - 1 + i;
