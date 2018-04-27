@@ -111,7 +111,7 @@ $tarabish.addEventListener('click', function playCards() {
   //deck.tarabish();
   // var len = cards.length
   deck.tarabish(0)
-  console.log('here ...')
+  //console.log('here ...')
   deck.test(0)
   // deck.dealSouthBidCards(-3,cards.length)
   // deck.dealWestBidCards(-6, -3)
@@ -122,7 +122,7 @@ $tarabish.addEventListener('click', function playCards() {
 
 deck.mount($container)
 
-deck.intro()
+//deck.intro()
 deck.sort()
 
 // secret message..

@@ -612,7 +612,7 @@ var Deck = (function () {
   };
 
   var ___fontSize;
-  var positions;
+  var game;
   var cards;
 
   var tarabish = {
@@ -622,7 +622,15 @@ var Deck = (function () {
       cards = _deck4.cards;
       var len = cards.length;
       console.log('cards length is ' + len);
-      positions = {
+      game = {
+        dealer: 'south',
+        currentPosition: 'west',
+        nextPlayer: function nextPlayer() {
+          var current = game.currentPosition;
+          var next = game[current].nextPosition;
+          game.currentPosition = next;
+          return next;
+        },
         west: {
           begOne: -6,
           endOne: -3,
@@ -682,55 +690,48 @@ var Deck = (function () {
       _deck4.tarabish = _deck4.queued(tarabish);
 
       function tarabish(next, dealer) {
-        //var cards = deck.cards
-        // var len = cards.length
 
-        // fontSize = getFontSize()
-
-        // cards.slice(-9).reverse().forEach(function (card, i) {
-        //   card.south(i, len, function (i) {
-        //     card.setSide('front')
-        //     if (i === 8) {
-        //       next()
-        //     }
-        //   })
-        // })
-        // dealSouthBidCards()
-        var myArry = ["west", "north", "east", "south"];
-        var offset = Math.floor(Math.random() * 4); //3;
-        var dealer = myArry[offset];
-        var pointer;
-        console.log('dealer is ' + dealer);
-        for (var i = 0; i < myArry.length; i++) {
-          pointer = (i + offset + 1) % myArry.length;
-          console.log(myArry[pointer]);
+        function chooseDealer(gameState) {
+          return new Promise(function (resolve, reject) {
+            var myArry = ["west", "north", "east", "south"];
+            var offset = Math.floor(Math.random() * 4);
+            var dealer = myArry[offset];
+            var pointer;
+            console.log('dealer is ' + dealer);
+            for (var i = 0; i < myArry.length; i++) {
+              pointer = (i + offset + 1) % myArry.length;
+              console.log(myArry[pointer]);
+            }
+            gameState.dealer = dealer;
+            gameState.currentPosition = gameState[dealer].nextPosition;
+            resolve(gameState);
+          });
         }
-
-        console.log('Dealer is ' + dealer + ' and position is ' + positions.west);
-        printMessage('Dealer is ' + dealer + ' and position is ' + positions.west);
-        //deck.dealBidCards(-3,cards.length)
-        // dealBidCards(positions.west)
-
         // next()
-        Promise.resolve(positions[myArry[pointer]]).then(function (result) {
-          return dealBidCards(result);
-        }).then(function (nextPos) {
-          return dealBidCards(positions[nextPos]);
-        }).then(function (nextPos) {
-          return dealBidCards(positions[nextPos]);
-        }).then(function (nextPos) {
-          return dealBidCards(positions[nextPos]);
-        }).then(function (finalResult) {
-          console.log('Got the final result: ' + finalResult);
+        // Promise.resolve(positions).then(function (result) {
+        //   printMessage(`Dealer is ${dealer} and position is ${game.west}`)
+        console.log('game is ' + game);
+        chooseDealer(game).then(function (gameState) {
+          return dealBidCards(gameState);
+        }).then(function (gameState) {
+          return dealBidCards(gameState);
+        }).then(function (gameState) {
+          return dealBidCards(gameState);
+        }).then(function (gameState) {
+          return dealBidCards(gameState);
+        }).then(function (gameState) {
+          console.log('Got the final result: ' + gameState);
           next();
         })['catch'](function (err) {
           console.log('Got an error : ' + err);
         });
       }
       // deck.dealBidCards = deck.queued(dealBidCards)
-      function dealBidCards(pos) {
-        console.log('begin dealBidCards...');
+      function dealBidCards(gameState) {
         return new Promise(function (resolve, reject) {
+          var pos = gameState[gameState.currentPosition];
+          console.log('begin dealBidCards...');
+          console.log('pos is ' + pos);
           //var cards = deck.cards
           var len = cards.length;
 
@@ -739,63 +740,61 @@ var Deck = (function () {
           // deck.southCards.concat(cards.slice(beg, end))
           cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
             //console.log(`card is${card}`);
-            card.dealBidCard(pos, i, len, function (i) {
+            card.dealBidCard(pos, i, len).then(function () {
+              //dealBidCard returns a promise
               card.setSide(pos.side);
               if (i === 2) {
                 //next()
-                resolve(pos.nextPosition);
+                gameState.nextPlayer();
+                resolve(gameState);
               }
             });
           });
         });
       }
 
-      function dealBidCardsOld(pos) {
-        //var cards = deck.cards
-        var len = cards.length;
+      // function dealBidCardsOld(pos) {
+      //   //var cards = deck.cards
+      //   var len = cards.length
 
-        ___fontSize = fontSize();
-        // Promise.resolve(cards).then(function (result) {
-        //   return Promise.all(result.map(function (card, i) {
-        //     return Promise.resolve(card.dealBidCard(pos, i, len).then(Promise.resolve(function (i) {
-        //       card.setSide(pos.side)
-        //       if (i === 2) {
-        //         // next()
-        //         console.log('returning from callback')
-        //         //return Promise.resolve(i);
-        //       }
+      //   fontSize = getFontSize()
+      //   // Promise.resolve(cards).then(function (result) {
+      //   //   return Promise.all(result.map(function (card, i) {
+      //   //     return Promise.resolve(card.dealBidCard(pos, i, len).then(Promise.resolve(function (i) {
+      //   //       card.setSide(pos.side)
+      //   //       if (i === 2) {
+      //   //         // next()
+      //   //         console.log('returning from callback')
+      //   //         //return Promise.resolve(i);
+      //   //       }
 
-        //     })))
-        //   }));
-        // }).then(function (arrayOfResults) {
-        //   // All docs have really been removed() now!
-        //   console.log(`result here...${arrayOfResults}`)
-        // });
-        var cb = function cb(i, card) {
-          return new Promise(function (resolve, reject) {
-            card.setSide(pos.side);
-            if (i === 2) {
-              // next()
-              console.log('returning from callback');
-              resolve(i);
-            }
-          });
-        };
-        var failureCallback = function failureCallback(err) {
-          console.log('finished...error is ' + err);
-        };
-        cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
-          var deal = function deal(pos, i, len) {
-            return new Promise(function (resolve) {
-              return card.dealBidCard(pos, i, len, resolve);
-            });
-          };
-          deal(pos, i, len).then(function () {
-            return cb(i, card);
-          })['catch'](failureCallback);
-          //card.dealBidCard(pos, i, len, cb)
-        });
-      }
+      //   //     })))
+      //   //   }));
+      //   // }).then(function (arrayOfResults) {
+      //   //   // All docs have really been removed() now!
+      //   //   console.log(`result here...${arrayOfResults}`)
+      //   // });
+      //   var cb = function (i, card) {
+      //     return new Promise(function (resolve, reject) {
+      //       card.setSide(pos.side)
+      //       if (i === 2) {
+      //         // next()
+      //         console.log('returning from callback')
+      //         resolve(i)
+      //       }
+      //     });
+      //   }
+      //   var failureCallback = function (err) {
+      //     console.log(`finished...error is ${err}`)
+      //   }
+      //   cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
+      //     const deal = (pos, i, len) => new Promise(resolve => card.dealBidCard(pos, i, len, resolve));
+      //     deal(pos, i, len)
+      //       .then(() => cb(i, card))
+      //       .catch(failureCallback);
+      //     //card.dealBidCard(pos, i, len, cb)
+      //   })
+      // }
 
       _deck4.test = _deck4.queued(test);
 
@@ -880,23 +879,24 @@ var Deck = (function () {
     card: function card(_card4) {
       var $el = _card4.$el;
 
-      _card4.dealBidCard = function (pos, i, len, cb) {
-        var delay = i * 250;
+      _card4.dealBidCard = function (pos, i, len) {
+        return new Promise(function (resolve, reject) {
+          var delay = i * 250;
+          _card4.animateTo({
+            delay: delay,
+            duration: 250,
 
-        _card4.animateTo({
-          delay: delay,
-          duration: 250,
-
-          y: pos.getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
-          x: pos.getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
-          rot: pos.rot,
-
-          onStart: function onStart() {
-            $el.style.zIndex = len - 1 + i;
-          },
-          onComplete: function onComplete() {
-            cb(i);
-          }
+            y: pos.getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
+            x: pos.getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
+            rot: pos.rot,
+            onStart: function onStart() {
+              $el.style.zIndex = len - 1 + i;
+            },
+            onComplete: function onComplete() {
+              //cb(i)
+              resolve();
+            }
+          });
         });
       };
       _card4.south = function (i, len, cb) {
