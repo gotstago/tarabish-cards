@@ -77,8 +77,10 @@ $poker.addEventListener('click', function () {
   deck.poker()
 })
 
-$tarabish.addEventListener('click', function () {
+$tarabish.addEventListener('click', function playCards() {
   // Remove the 2,3,4,5 of each suit card from deck
+  //$tarabish.removeEventListener('click', playCards)
+  $tarabish.disabled = true;
   var cards = deck.cards
   var removedCards = cards.splice(8, 4);
   removedCards.forEach(function (removedCard) {

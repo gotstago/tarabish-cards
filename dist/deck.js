@@ -699,18 +699,20 @@ var Deck = (function () {
         var myArry = ["west", "north", "east", "south"];
         var offset = Math.floor(Math.random() * 4); //3;
         var dealer = myArry[offset];
+        var pointer;
         console.log('dealer is ' + dealer);
         for (var i = 0; i < myArry.length; i++) {
-          var pointer = (i + offset + 1) % myArry.length;
+          pointer = (i + offset + 1) % myArry.length;
           console.log(myArry[pointer]);
         }
 
         console.log('Dealer is ' + dealer + ' and position is ' + positions.west);
+        printMessage('Dealer is ' + dealer + ' and position is ' + positions.west);
         //deck.dealBidCards(-3,cards.length)
         // dealBidCards(positions.west)
 
         // next()
-        Promise.resolve(positions.west).then(function (result) {
+        Promise.resolve(positions[myArry[pointer]]).then(function (result) {
           return dealBidCards(result);
         }).then(function (nextPos) {
           return dealBidCards(positions[nextPos]);
