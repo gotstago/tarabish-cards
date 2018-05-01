@@ -688,28 +688,63 @@ var Deck = (function () {
       var myGame = (function () {
 
         // set up closure scope
-        var state = 1;
-        var dealer = 'south';
-        var currentPosition = 'west';
-
+        // var state = 1;
+        var dealerPosition; // = 'south';
+        var currentPosition; // = 'west';
+        var playerPositions = ["west", "north", "east", "south"];
+        var dealCount = 0;
         // return object with methods to manipulate closure scope
         return {
-          incr: function incr() {
-            state++;
-          },
-          decr: function decr() {
-            state--;
-          },
-          setDealer: function setDealer(d) {
-            dealer = d;
-          },
+          // deal: function (amount, repeat = 1) {
+          //   printMessage(`dealing ${amount} cards ${repeat} times.`)
+          // },
+          // decr: function () {
+          //   state--;
+          // },
+          // setDealer: function (d) {
+          //   dealer = d;
+          // },
           getDealer: function getDealer() {
-            return dealer;
+            return playerPositions[dealerPosition];
           },
           getCurrentPosition: function getCurrentPosition() {
             return currentPosition;
+          },
+          start: function start(params) {
+            return chooseDealer().then(function (data) {
+              return deal(3, 2);
+            }).then(function (data) {
+              return 'finished game';
+            });
           }
         };
+        function deal(amount) {
+          var repeat = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+          return new Promise(function (resolve, reject) {
+            var cardCount = amount * repeat;
+            var len = cards.length;
+            console.log('dealing ' + amount + ' cards ' + repeat + ' times from deck of ' + len + '.');
+            resolve();
+          });
+        }
+        function chooseDealer(gameState) {
+          return new Promise(function (resolve, reject) {
+
+            var offset = Math.floor(Math.random() * 4);
+            dealerPosition = offset;
+            // var pointer
+            console.log('dealer is ' + playerPositions[dealerPosition]);
+            //for (var i = 0; i < playerPositions.length; i++) {
+            currentPosition = (offset + 1) % playerPositions.length;
+            console.log('first to bid is ' + playerPositions[currentPosition]);
+            //   console.log(playerPositions[pointer]);
+            // }
+            //gameState.dealer = dealer
+            //gameState.currentPosition = gameState[dealer].nextPosition
+            resolve();
+          });
+        }
       })();
 
       // x: Math.round((i - 1.05) * 20 * fontSize / 16),
@@ -718,23 +753,6 @@ var Deck = (function () {
       _deck4.tarabish = _deck4.queued(tarabish);
 
       function tarabish(next, dealer) {
-
-        function chooseDealer(gameState) {
-          return new Promise(function (resolve, reject) {
-            var myArry = ["west", "north", "east", "south"];
-            var offset = Math.floor(Math.random() * 4);
-            var dealer = myArry[offset];
-            var pointer;
-            console.log('dealer is ' + dealer);
-            for (var i = 0; i < myArry.length; i++) {
-              pointer = (i + offset + 1) % myArry.length;
-              console.log(myArry[pointer]);
-            }
-            gameState.dealer = dealer;
-            //gameState.currentPosition = gameState[dealer].nextPosition
-            resolve(gameState);
-          });
-        }
 
         var rounds = [[-3, cards.length], [-6, -3], [-9, -6], [-12, -9]];
         // var fn = function asyncSetParams(params) {
@@ -753,7 +771,7 @@ var Deck = (function () {
         // );
 
         //rounds.map(dealBidCards)
-        var chain = chooseDealer(myGame); // = Promise.resolve()
+        var chain; // = myGame.start()// = Promise.resolve()
         // for (var i = 0; i < 4; i++) {
         //   game[game.currentPosition].begOne = rounds[i][0]
         //   game[game.currentPosition].endOne = rounds[i][1]
@@ -761,7 +779,7 @@ var Deck = (function () {
         //     return dealBidCards(gameState);
         //   });
         // }
-        chain.then(function (gameState) {
+        myGame.start().then(function (gameState) {
           console.log('Got the final result: ' + gameState);
           next();
         });
