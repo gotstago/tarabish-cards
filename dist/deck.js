@@ -692,7 +692,7 @@ var Deck = (function () {
         var dealerPosition; // = 'south';
         var currentPosition; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
-        var dealCount = 0;
+        var dealCount = cards.length;
         // return object with methods to manipulate closure scope
         return {
           // deal: function (amount, repeat = 1) {
@@ -707,12 +707,12 @@ var Deck = (function () {
           getDealer: function getDealer() {
             return playerPositions[dealerPosition];
           },
-          getCurrentPosition: function getCurrentPosition() {
-            return currentPosition;
+          getCurrent: function getCurrent() {
+            return playerPositions[currentPosition];
           },
           start: function start(params) {
             return chooseDealer().then(function (data) {
-              return deal(3, 2);
+              return deal(3, 4);
             }).then(function (data) {
               return 'finished game';
             });
@@ -724,7 +724,41 @@ var Deck = (function () {
           return new Promise(function (resolve, reject) {
             var cardCount = amount * repeat;
             var len = cards.length;
+            var cardsToDeal = cards.slice(len - dealCount - cardCount, len - dealCount);
+            //dealCount starts at 0, and we are beginning at the top of the deck
+            //var beginning =
             console.log('dealing ' + amount + ' cards ' + repeat + ' times from deck of ' + len + '.');
+            console.log('first to bid is ' + playerPositions[currentPosition]);
+            console.log('dealer is ' + playerPositions[dealerPosition]);
+            var currentCard;
+            for (var repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
+              for (var amountIndex = 0; amountIndex < amount; amountIndex++) {
+                console.log('here');
+                currentCard = cardsToDeal.pop();
+                dealBidCard(currentCard);
+              }
+              if (repeatIndex === repeat - 1) {
+                resolve();
+              }
+              //currentCard = cardsToDeal.pop()          
+            }
+            // cardsToDeal.reverse().forEach(function (card, i) {
+            //   //console.log(`card is${card}`);
+            //   card.dealBidCard(pos, i, len)
+            //     .then(function () {//dealBidCard returns a promise
+            //       card.setSide(pos.side)
+            //       if (i === 2) {
+            //         //next()
+            //         gameState.nextPlayer()
+            //         resolve(gameState)
+            //       }
+            //     })
+            // })
+          });
+        }
+        function dealBidCard(card) {
+          return new Promise(function (resolve, reject) {
+            console.log('card is ' + card);
             resolve();
           });
         }
@@ -734,10 +768,10 @@ var Deck = (function () {
             var offset = Math.floor(Math.random() * 4);
             dealerPosition = offset;
             // var pointer
-            console.log('dealer is ' + playerPositions[dealerPosition]);
+            // console.log(`dealer is ${playerPositions[dealerPosition]}`)
             //for (var i = 0; i < playerPositions.length; i++) {
             currentPosition = (offset + 1) % playerPositions.length;
-            console.log('first to bid is ' + playerPositions[currentPosition]);
+            //console.log(`first to bid is ${playerPositions[currentPosition]}`)
             //   console.log(playerPositions[pointer]);
             // }
             //gameState.dealer = dealer
