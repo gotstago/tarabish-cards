@@ -694,6 +694,60 @@ var Deck = (function () {
         var playerPositions = ["west", "north", "east", "south"];
         var dealCount = cards.length;
         // return object with methods to manipulate closure scope
+        var positions = {
+          west: {
+            begOne: -6,
+            endOne: -3,
+            side: 'back',
+            getY: function getY(idx, fs) {
+              return Math.round((idx - 1.05) * 20 * fs / 16);
+            },
+            getX: function getX(idx, fs) {
+              return Math.round(-150 * fs / 16);
+            },
+            nextPosition: 'north',
+            rot: 90
+          },
+          north: {
+            begOne: -9,
+            endOne: -6,
+            side: 'back',
+            getY: function getY(idx, fs) {
+              return Math.round(-110 * fs / 16);
+            },
+            getX: function getX(idx, fs) {
+              return Math.round((idx - 1.05) * 20 * fs / 16);
+            },
+            nextPosition: 'east',
+            rot: 0
+          },
+          east: {
+            begOne: -12,
+            endOne: -9,
+            side: 'back',
+            getY: function getY(idx, fs) {
+              return Math.round((idx - 1.05) * 20 * fs / 16);
+            },
+            getX: function getX(idx, fs) {
+              return Math.round(150 * fs / 16);
+            },
+            nextPosition: 'south',
+            rot: 90
+          },
+          south: {
+            begOne: -15,
+            endOne: -12,
+            side: 'front',
+            getY: function getY(idx, fs) {
+              return Math.round(110 * fs / 16);
+            },
+            getX: function getX(idx, fs) {
+              return Math.round((idx - 1.05) * 20 * fs / 16);
+            },
+            nextPosition: 'west',
+            rot: 0
+          }
+        };
         return {
           // deal: function (amount, repeat = 1) {
           //   printMessage(`dealing ${amount} cards ${repeat} times.`)
@@ -732,11 +786,14 @@ var Deck = (function () {
             console.log('dealer is ' + playerPositions[dealerPosition]);
             var currentCard;
             for (var repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
+              //4
               for (var amountIndex = 0; amountIndex < amount; amountIndex++) {
+                //3
                 console.log('here');
                 currentCard = cardsToDeal.pop();
-                dealBidCard(currentCard);
+                dealBidCard(currentCard, amountIndex);
               }
+              currentPosition = currentPosition + 1 % repeat;
               if (repeatIndex === repeat - 1) {
                 resolve();
               }
@@ -756,12 +813,52 @@ var Deck = (function () {
             // })
           });
         }
-        function dealBidCard(card) {
+        function dealBidCard(card, i) {
           return new Promise(function (resolve, reject) {
-            console.log('card is ' + card);
-            resolve();
+            console.log('deal card ' + card + ' to ' + playerPositions[currentPosition]);
+            var delay = i * 250;
+            var len = cards.length;
+            ___fontSize = fontSize();
+            card.animateTo({
+              delay: delay,
+              duration: 250,
+
+              y: positions[playerPositions[currentPosition]].getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
+              x: positions[playerPositions[currentPosition]].getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
+              rot: positions[playerPositions[currentPosition]].rot,
+              onStart: function onStart() {
+                card.$el.style.zIndex = len - 1 + i;
+              },
+              onComplete: function onComplete() {
+                //cb(i)
+                resolve();
+              }
+            });
+            // resolve()
           });
         }
+        // var $el = card.$el
+
+        // card.dealBidCard = function (pos, i, len) {
+        //   return new Promise(function (resolve, reject) {
+        //     var delay = i * 250
+        //     card.animateTo({
+        //       delay: delay,
+        //       duration: 250,
+
+        //       y: pos.getY(i, fontSize),//Math.round((i - 1.05) * 20 * fontSize / 16),
+        //       x: pos.getX(i, fontSize),//Math.round(-150 * fontSize / 16),
+        //       rot: pos.rot,
+        //       onStart: function () {
+        //         $el.style.zIndex = (len - 1) + i
+        //       },
+        //       onComplete: function () {
+        //         //cb(i)
+        //         resolve()
+        //       }
+        //     })
+        //   })
+        // }
         function chooseDealer(gameState) {
           return new Promise(function (resolve, reject) {
 
