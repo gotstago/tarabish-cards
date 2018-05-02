@@ -775,57 +775,77 @@ var Deck = (function () {
         function deal(amount) {
           var repeat = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
 
-          return new Promise(function (resolve, reject) {
-            var cardCount = amount * repeat;
-            var len = cards.length;
-            var cardsToDeal = cards.slice(len - dealCount - cardCount, len - dealCount);
-            //dealCount starts at 0, and we are beginning at the top of the deck
-            //var beginning =
-            console.log('dealing ' + amount + ' cards ' + repeat + ' times from deck of ' + len + '.');
-            console.log('first to bid is ' + playerPositions[currentPosition]);
-            console.log('dealer is ' + playerPositions[dealerPosition]);
-            var currentCard;
-            for (var repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
-              //4
-              for (var amountIndex = 0; amountIndex < amount; amountIndex++) {
-                //3
-                console.log('here');
-                currentCard = cardsToDeal.pop();
-                dealBidCard(currentCard, amountIndex);
-              }
-              currentPosition = currentPosition + 1 % repeat;
-              if (repeatIndex === repeat - 1) {
-                resolve();
-              }
-              //currentCard = cardsToDeal.pop()          
+          //return new Promise(function (resolve, reject) {
+          var cardCount = amount * repeat;
+          var len = cards.length;
+          var cardsToDeal = cards.slice(len - dealCount - cardCount, len - dealCount);
+          //dealCount starts at 0, and we are beginning at the top of the deck
+          //var beginning =
+          console.log('dealing ' + amount + ' cards ' + repeat + ' times from deck of ' + len + '.');
+          console.log('first to bid is ' + playerPositions[currentPosition]);
+          console.log('dealer is ' + playerPositions[dealerPosition]);
+          // let pos = positions[playerPositions[currentPosition]]
+          //let currentCard
+          var chain = Promise.resolve();
+          // (async function loop() {
+          for (var repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
+            var _loop = function () {
+              //3
+              var pos = positions[playerPositions[currentPosition]];
+              var currentCard = cardsToDeal.pop();
+              //console.log(`card is ${currentCard.rank} of ${currentCard.suit}`)
+              console.log('cardsToDeal are ' + cardsToDeal.length);
+              chain = chain.then(function () {
+                // let pos = positions[playerPositions[currentPosition]]
+                dealBidCard(pos, currentCard, amountIndex);
+              });
+            };
+
+            //4
+            for (var amountIndex = 0; amountIndex < amount; amountIndex++) {
+              _loop();
             }
-            // cardsToDeal.reverse().forEach(function (card, i) {
-            //   //console.log(`card is${card}`);
-            //   card.dealBidCard(pos, i, len)
-            //     .then(function () {//dealBidCard returns a promise
-            //       card.setSide(pos.side)
-            //       if (i === 2) {
-            //         //next()
-            //         gameState.nextPlayer()
-            //         resolve(gameState)
-            //       }
-            //     })
-            // })
-          });
+            currentPosition = currentPosition + 1 % repeat;
+            // if (repeatIndex === (repeat - 1)) {
+            //   resolve()
+            // }
+            //currentCard = cardsToDeal.pop()          
+          }
+          //console.log(`cardsToDeal are ${cardsToDeal.length}`)
+          return chain;
+          // })();
+          //resolve()
+          // cardsToDeal.reverse().forEach(function (card, i) {
+          //   //console.log(`card is${card}`);
+          //   card.dealBidCard(pos, i, len)
+          //     .then(function () {//dealBidCard returns a promise
+          //       card.setSide(pos.side)
+          //       if (i === 2) {
+          //         //next()
+          //         gameState.nextPlayer()
+          //         resolve(gameState)
+          //       }
+          //     })
+          // })
+
+          // })
         }
-        function dealBidCard(card, i) {
+        function dealBidCard(position, card, i) {
           return new Promise(function (resolve, reject) {
-            console.log('deal card ' + card + ' to ' + playerPositions[currentPosition]);
+            //console.log(`deal card ${card} to ${position.nextPosition}`)
             var delay = i * 250;
             var len = cards.length;
+            var currentY = position.getY(i, ___fontSize);
+            var currentX = position.getX(i, ___fontSize);
             ___fontSize = fontSize();
+            console.log('card is ' + card.rank + ' of ' + card.suit + ', currentY is ' + currentY + ' and currentX is ' + currentX);
             card.animateTo({
               delay: delay,
               duration: 250,
 
-              y: positions[playerPositions[currentPosition]].getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
-              x: positions[playerPositions[currentPosition]].getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
-              rot: positions[playerPositions[currentPosition]].rot,
+              y: currentY, //Math.round((i - 1.05) * 20 * fontSize / 16),
+              x: currentX, //Math.round(-150 * fontSize / 16),
+              rot: position.rot,
               onStart: function onStart() {
                 card.$el.style.zIndex = len - 1 + i;
               },
