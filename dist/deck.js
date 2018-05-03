@@ -690,9 +690,9 @@ var Deck = (function () {
         // set up closure scope
         // var state = 1;
         var dealerPosition; // = 'south';
-        var currentPosition; // = 'west';
+        var currentPosition = undefined; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
-        var dealCount = cards.length;
+        var dealCount = 0; //cards.length
         // return object with methods to manipulate closure scope
         var positions = {
           west: {
@@ -778,7 +778,7 @@ var Deck = (function () {
           //return new Promise(function (resolve, reject) {
           var cardCount = amount * repeat;
           var len = cards.length;
-          var cardsToDeal = cards.slice(len - dealCount - cardCount, len - dealCount);
+          var cardsToDeal = cards.slice(len - dealCount - cardCount, len - dealCount); //.reverse()
           //dealCount starts at 0, and we are beginning at the top of the deck
           //var beginning =
           console.log('dealing ' + amount + ' cards ' + repeat + ' times from deck of ' + len + '.');
@@ -789,23 +789,29 @@ var Deck = (function () {
           var chain = Promise.resolve();
           // (async function loop() {
           for (var repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
-            var _loop = function () {
+            var _loop = function (amountIndex) {
               //3
-              var pos = positions[playerPositions[currentPosition]];
+              // let pos = positions[playerPositions[currentPosition]]
               var currentCard = cardsToDeal.pop();
               //console.log(`card is ${currentCard.rank} of ${currentCard.suit}`)
               console.log('cardsToDeal are ' + cardsToDeal.length);
-              chain = chain.then(function () {
-                // let pos = positions[playerPositions[currentPosition]]
-                dealBidCard(pos, currentCard, amountIndex);
-              });
+              //let cp = currentPosition
+              (function (cp) {
+                chain = chain.then(function () {
+                  return dealBidCard(cp, currentCard, amountIndex);
+                });
+                // do your stuff here
+                // use the index variable - it is assigned to the value of 'i'
+                // that was passed in during the loop iteration.
+              })(currentPosition);
             };
 
             //4
             for (var amountIndex = 0; amountIndex < amount; amountIndex++) {
-              _loop();
+              _loop(amountIndex);
             }
-            currentPosition = currentPosition + 1 % repeat;
+            currentPosition = (currentPosition + 1) % repeat;
+            console.log('after incrementing, currentPosition is ' + currentPosition);
             // if (repeatIndex === (repeat - 1)) {
             //   resolve()
             // }
@@ -830,19 +836,20 @@ var Deck = (function () {
 
           // })
         }
-        function dealBidCard(position, card, i) {
+        function dealBidCard(cp, card, i) {
           return new Promise(function (resolve, reject) {
             //console.log(`deal card ${card} to ${position.nextPosition}`)
             var delay = i * 250;
             var len = cards.length;
+            console.log('currentPosition is ' + cp);
+            var position = positions[playerPositions[cp]];
             var currentY = position.getY(i, ___fontSize);
             var currentX = position.getX(i, ___fontSize);
             ___fontSize = fontSize();
-            console.log('card is ' + card.rank + ' of ' + card.suit + ', currentY is ' + currentY + ' and currentX is ' + currentX);
+            console.log('card is ' + card.rank + ' of ' + card.suit + ', i is ' + i + ', currentY is ' + currentY + ' and currentX is ' + currentX);
             card.animateTo({
               delay: delay,
               duration: 250,
-
               y: currentY, //Math.round((i - 1.05) * 20 * fontSize / 16),
               x: currentX, //Math.round(-150 * fontSize / 16),
               rot: position.rot,
