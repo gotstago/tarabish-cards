@@ -637,52 +637,56 @@ var Deck = (function () {
             endOne: -3,
             side: 'back',
             getY: function getY(idx, fs) {
-              return Math.round((idx - 1.05) * 20 * fs / 16);
+              return Math.round((idx - 1.95) * 10 * fs / 16);
             },
             getX: function getX(idx, fs) {
               return Math.round(-150 * fs / 16);
             },
             nextPosition: 'north',
-            rot: 90
+            rot: 90,
+            cards: new Array()
           },
           north: {
             begOne: -9,
             endOne: -6,
             side: 'back',
             getY: function getY(idx, fs) {
-              return Math.round(-110 * fs / 16);
+              return Math.round(-130 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round((idx - 1.05) * 20 * fs / 16);
+              return Math.round((idx - 1.95) * 10 * fs / 16);
             },
             nextPosition: 'east',
-            rot: 0
+            rot: 0,
+            cards: new Array()
           },
           east: {
             begOne: -12,
             endOne: -9,
             side: 'back',
             getY: function getY(idx, fs) {
-              return Math.round((idx - 1.05) * 20 * fs / 16);
+              return Math.round((idx - 1.95) * 10 * fs / 16);
             },
             getX: function getX(idx, fs) {
               return Math.round(150 * fs / 16);
             },
             nextPosition: 'south',
-            rot: 90
+            rot: 90,
+            cards: new Array()
           },
           south: {
             begOne: -15,
             endOne: -12,
             side: 'front',
             getY: function getY(idx, fs) {
-              return Math.round(110 * fs / 16);
+              return Math.round(130 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round((idx - 1.05) * 20 * fs / 16);
+              return Math.round((idx - 1.95) * 20 * fs / 16);
             },
             nextPosition: 'west',
-            rot: 0
+            rot: 0,
+            cards: new Array()
           }
         };
         return {
@@ -694,6 +698,8 @@ var Deck = (function () {
           },
           start: function start(params) {
             return chooseDealer().then(function (data) {
+              return deal(3, 4);
+            }).then(function (data) {
               return deal(3, 4);
             }).then(function (data) {
               return 'finished game';
@@ -747,14 +753,18 @@ var Deck = (function () {
         function dealBidCard(cp, card, i) {
           return new Promise(function (resolve, reject) {
             //console.log(`deal card ${card} to ${position.nextPosition}`)
-            var delay = i * 250;
+            var position = positions[playerPositions[cp]];
+            console.log('position is ' + position.nextPosition);
+            //debugger
+            var handSize = position.cards.length;
+            console.log('handSize is ' + handSize);
+            var delay = 250; //handSize * 250//i * 250
             var len = cards.length;
             console.log('currentPosition is ' + cp);
-            var position = positions[playerPositions[cp]];
-            var currentY = position.getY(i, ___fontSize);
-            var currentX = position.getX(i, ___fontSize);
+            var currentY = position.getY(handSize, ___fontSize);
+            var currentX = position.getX(handSize, ___fontSize);
             ___fontSize = fontSize();
-            console.log('card is ' + card.rank + ' of ' + card.suit + ', i is ' + i + ', \n              currentY is ' + currentY + ' and currentX is ' + currentX);
+            console.log('card is ' + card.rank + ' of ' + card.suit + ', handSize is ' + handSize + ', \n              currentY is ' + currentY + ' and currentX is ' + currentX);
             card.animateTo({
               delay: delay,
               duration: 250,
@@ -762,10 +772,12 @@ var Deck = (function () {
               x: currentX, //Math.round(-150 * fontSize / 16),
               rot: position.rot,
               onStart: function onStart() {
-                card.$el.style.zIndex = len - 1 + i;
+                card.$el.style.zIndex = len - 1 + handSize;
               },
               onComplete: function onComplete() {
                 card.setSide(position.side);
+                position.cards.push(card);
+                dealCount++;
                 resolve();
               }
             });
