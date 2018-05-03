@@ -106,8 +106,8 @@ $tarabish.addEventListener('click', function playCards() {
     })
     next()
   })
-  // deck.shuffle()
-  // deck.shuffle()
+  deck.shuffle()
+  deck.shuffle()
   //deck.tarabish();
   // var len = cards.length
   deck.tarabish(0)

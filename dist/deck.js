@@ -612,7 +612,6 @@ var Deck = (function () {
   };
 
   var ___fontSize;
-  var game;
   var cards;
 
   var tarabish = {
@@ -622,68 +621,6 @@ var Deck = (function () {
       cards = _deck4.cards;
       var len = cards.length;
       console.log('cards length is ' + len);
-      game = {
-        dealer: 'south',
-        currentPosition: 'west',
-        nextPlayer: function nextPlayer() {
-          var current = game.currentPosition;
-          var next = game[current].nextPosition;
-          game.currentPosition = next;
-          return next;
-        },
-        west: {
-          begOne: -6,
-          endOne: -3,
-          side: 'back',
-          getY: function getY(idx, fs) {
-            return Math.round((idx - 1.05) * 20 * fs / 16);
-          },
-          getX: function getX(idx, fs) {
-            return Math.round(-150 * fs / 16);
-          },
-          nextPosition: 'north',
-          rot: 90
-        },
-        north: {
-          begOne: -9,
-          endOne: -6,
-          side: 'back',
-          getY: function getY(idx, fs) {
-            return Math.round(-110 * fs / 16);
-          },
-          getX: function getX(idx, fs) {
-            return Math.round((idx - 1.05) * 20 * fs / 16);
-          },
-          nextPosition: 'east',
-          rot: 0
-        },
-        east: {
-          begOne: -12,
-          endOne: -9,
-          side: 'back',
-          getY: function getY(idx, fs) {
-            return Math.round((idx - 1.05) * 20 * fs / 16);
-          },
-          getX: function getX(idx, fs) {
-            return Math.round(150 * fs / 16);
-          },
-          nextPosition: 'south',
-          rot: 90
-        },
-        south: {
-          begOne: -15,
-          endOne: -12,
-          side: 'front',
-          getY: function getY(idx, fs) {
-            return Math.round(110 * fs / 16);
-          },
-          getX: function getX(idx, fs) {
-            return Math.round((idx - 1.05) * 20 * fs / 16);
-          },
-          nextPosition: 'west',
-          rot: 0
-        }
-      };
 
       var myGame = (function () {
 
@@ -749,15 +686,6 @@ var Deck = (function () {
           }
         };
         return {
-          // deal: function (amount, repeat = 1) {
-          //   printMessage(`dealing ${amount} cards ${repeat} times.`)
-          // },
-          // decr: function () {
-          //   state--;
-          // },
-          // setDealer: function (d) {
-          //   dealer = d;
-          // },
           getDealer: function getDealer() {
             return playerPositions[dealerPosition];
           },
@@ -812,29 +740,9 @@ var Deck = (function () {
             }
             currentPosition = (currentPosition + 1) % repeat;
             console.log('after incrementing, currentPosition is ' + currentPosition);
-            // if (repeatIndex === (repeat - 1)) {
-            //   resolve()
-            // }
-            //currentCard = cardsToDeal.pop()          
           }
           //console.log(`cardsToDeal are ${cardsToDeal.length}`)
           return chain;
-          // })();
-          //resolve()
-          // cardsToDeal.reverse().forEach(function (card, i) {
-          //   //console.log(`card is${card}`);
-          //   card.dealBidCard(pos, i, len)
-          //     .then(function () {//dealBidCard returns a promise
-          //       card.setSide(pos.side)
-          //       if (i === 2) {
-          //         //next()
-          //         gameState.nextPlayer()
-          //         resolve(gameState)
-          //       }
-          //     })
-          // })
-
-          // })
         }
         function dealBidCard(cp, card, i) {
           return new Promise(function (resolve, reject) {
@@ -846,7 +754,7 @@ var Deck = (function () {
             var currentY = position.getY(i, ___fontSize);
             var currentX = position.getX(i, ___fontSize);
             ___fontSize = fontSize();
-            console.log('card is ' + card.rank + ' of ' + card.suit + ', i is ' + i + ', currentY is ' + currentY + ' and currentX is ' + currentX);
+            console.log('card is ' + card.rank + ' of ' + card.suit + ', i is ' + i + ', \n              currentY is ' + currentY + ' and currentX is ' + currentX);
             card.animateTo({
               delay: delay,
               duration: 250,
@@ -857,210 +765,53 @@ var Deck = (function () {
                 card.$el.style.zIndex = len - 1 + i;
               },
               onComplete: function onComplete() {
-                //cb(i)
+                card.setSide(position.side);
                 resolve();
               }
             });
-            // resolve()
           });
         }
-        // var $el = card.$el
 
-        // card.dealBidCard = function (pos, i, len) {
-        //   return new Promise(function (resolve, reject) {
-        //     var delay = i * 250
-        //     card.animateTo({
-        //       delay: delay,
-        //       duration: 250,
-
-        //       y: pos.getY(i, fontSize),//Math.round((i - 1.05) * 20 * fontSize / 16),
-        //       x: pos.getX(i, fontSize),//Math.round(-150 * fontSize / 16),
-        //       rot: pos.rot,
-        //       onStart: function () {
-        //         $el.style.zIndex = (len - 1) + i
-        //       },
-        //       onComplete: function () {
-        //         //cb(i)
-        //         resolve()
-        //       }
-        //     })
-        //   })
-        // }
         function chooseDealer(gameState) {
           return new Promise(function (resolve, reject) {
-
             var offset = Math.floor(Math.random() * 4);
             dealerPosition = offset;
-            // var pointer
-            // console.log(`dealer is ${playerPositions[dealerPosition]}`)
-            //for (var i = 0; i < playerPositions.length; i++) {
             currentPosition = (offset + 1) % playerPositions.length;
-            //console.log(`first to bid is ${playerPositions[currentPosition]}`)
-            //   console.log(playerPositions[pointer]);
-            // }
-            //gameState.dealer = dealer
-            //gameState.currentPosition = gameState[dealer].nextPosition
             resolve();
           });
         }
       })();
 
-      // x: Math.round((i - 1.05) * 20 * fontSize / 16),
-      // y: Math.round(-110 * fontSize / 16),
-
       _deck4.tarabish = _deck4.queued(tarabish);
 
       function tarabish(next, dealer) {
-
         var rounds = [[-3, cards.length], [-6, -3], [-9, -6], [-12, -9]];
-        // var fn = function asyncSetParams(params) {
-        //   game[game.currentPosition].begOne = params[0]
-        //   game[game.currentPosition].endOne = params[1]
-        //   //return function (game) {
-        //   return dealBidCards(game);
-        //   //}
-        // }
-        // var actions = rounds.map(fn)
-
-        // var results = Promise.all(actions)
-
-        // results.then(data => // or just .then(console.log)
-        //   console.log(`data is ${data}`) // [2, 4, 6, 8, 10]
-        // );
-
-        //rounds.map(dealBidCards)
-        var chain; // = myGame.start()// = Promise.resolve()
-        // for (var i = 0; i < 4; i++) {
-        //   game[game.currentPosition].begOne = rounds[i][0]
-        //   game[game.currentPosition].endOne = rounds[i][1]
-        //   chain = chain.then(function (gameState) {
-        //     return dealBidCards(gameState);
-        //   });
-        // }
+        var chain;
         myGame.start().then(function (gameState) {
           console.log('Got the final result: ' + gameState);
           next();
         });
-        //   .catch(function (err) {
-        //     console.log('Got an error : ' + err);
-        //   });
-        // console.log(`game is ${game}`)
-        // chooseDealer(game)
-        //   .then(function () {
-        //     return Promise.all(actions)
-        //   })
-        //   .then(function (gameState) {
-        //     return dealBidCards(gameState);
-        //   })
-        //   // .then(function (gameState) {
-        //   //   return dealBidCards(gameState);
-        //   // })
-        //   // .then(function (gameState) {
-        //   //   return dealBidCards(gameState);
-        //   // })
-        //   // .then(function (gameState) {
-        //   //   return dealBidCards(gameState);
-        //   // })
-        //   .then(function (gameState) {
-        //     console.log('Got the final result: ' + gameState);
-        //     next()
-        //   })
-        //   .catch(function (err) {
-        //     console.log('Got an error : ' + err);
-        //   });
       }
       // deck.dealBidCards = deck.queued(dealBidCards)
-      function dealBidCards(gameState) {
-        return new Promise(function (resolve, reject) {
-          var pos = gameState[gameState.currentPosition];
-          console.log('begin dealBidCards...');
-          // console.log(`pos is ${pos}`)
-          //var cards = deck.cards
-          var len = cards.length;
+      // function dealBidCards(gameState) {
+      //   return new Promise(function (resolve, reject) {
+      //     var pos = gameState[gameState.currentPosition]
+      //     console.log('begin dealBidCards...')
+      //     var len = cards.length
 
-          ___fontSize = fontSize();
-          // deck.southCards = deck.southCards || [];
-          // deck.southCards.concat(cards.slice(beg, end))
-          console.log('pos.begOne is ' + pos.begOne + ' and pos.endOne is ' + pos.endOne);
-          cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
-            //console.log(`card is${card}`);
-            card.dealBidCard(pos, i, len).then(function () {
-              //dealBidCard returns a promise
-              card.setSide(pos.side);
-              if (i === 2) {
-                //next()
-                gameState.nextPlayer();
-                resolve(gameState);
-              }
-            });
-          });
-        });
-      }
-      var myStatefulObj = (function () {
-
-        // set up closure scope
-        var state = 1;
-
-        // return object with methods to manipulate closure scope
-        return {
-          incr: function incr() {
-            state++;
-          },
-          decr: function decr() {
-            state--;
-          },
-          get: function get() {
-            return state;
-          }
-        };
-      })();
-
-      myStatefulObj.incr();
-      var currState = myStatefulObj.get(); // currState === 2
-      console.log('currState is ' + currState);
-      myStatefulObj.decr();
-      currState = myStatefulObj.get(); // currState === 1
-      // function dealBidCardsOld(pos) {
-      //   //var cards = deck.cards
-      //   var len = cards.length
-
-      //   fontSize = getFontSize()
-      //   // Promise.resolve(cards).then(function (result) {
-      //   //   return Promise.all(result.map(function (card, i) {
-      //   //     return Promise.resolve(card.dealBidCard(pos, i, len).then(Promise.resolve(function (i) {
-      //   //       card.setSide(pos.side)
-      //   //       if (i === 2) {
-      //   //         // next()
-      //   //         console.log('returning from callback')
-      //   //         //return Promise.resolve(i);
-      //   //       }
-
-      //   //     })))
-      //   //   }));
-      //   // }).then(function (arrayOfResults) {
-      //   //   // All docs have really been removed() now!
-      //   //   console.log(`result here...${arrayOfResults}`)
-      //   // });
-      //   var cb = function (i, card) {
-      //     return new Promise(function (resolve, reject) {
-      //       card.setSide(pos.side)
-      //       if (i === 2) {
-      //         // next()
-      //         console.log('returning from callback')
-      //         resolve(i)
-      //       }
-      //     });
-      //   }
-      //   var failureCallback = function (err) {
-      //     console.log(`finished...error is ${err}`)
-      //   }
-      //   cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
-      //     const deal = (pos, i, len) => new Promise(resolve => card.dealBidCard(pos, i, len, resolve));
-      //     deal(pos, i, len)
-      //       .then(() => cb(i, card))
-      //       .catch(failureCallback);
-      //     //card.dealBidCard(pos, i, len, cb)
-      //   })
+      //     fontSize = getFontSize()
+      //     console.log(`pos.begOne is ${pos.begOne} and pos.endOne is ${pos.endOne}`)
+      //     cards.slice(pos.begOne, pos.endOne).reverse().forEach(function (card, i) {
+      //       card.dealBidCard(pos, i, len)
+      //         .then(function () {//dealBidCard returns a promise
+      //           card.setSide(pos.side)
+      //           if (i === 2) {
+      //             gameState.nextPlayer()
+      //             resolve(gameState)
+      //           }
+      //         })
+      //     })
+      //   });
       // }
 
       _deck4.test = _deck4.queued(test);
@@ -1069,179 +820,30 @@ var Deck = (function () {
         console.log('test is ' + dealer);
         next();
       }
-
-      _deck4.dealNorthBidCards = _deck4.queued(dealNorthBidCards);
-
-      function dealNorthBidCards(next, beg, end) {
-        var cards = _deck4.cards;
-        var len = cards.length;
-
-        ___fontSize = fontSize();
-        // deck.southCards = deck.southCards || [];
-        // deck.southCards.concat(cards.slice(beg, end))
-        cards.slice(beg, end).reverse().forEach(function (card, i) {
-          //console.log(`card is${card}`);
-          card.north(i, len, function (i) {
-            card.setSide('back');
-            if (i === 2) {
-              next();
-            }
-          });
-        });
-      }
-      _deck4.dealSouthBidCards = _deck4.queued(dealSouthBidCards);
-
-      function dealSouthBidCards(next, beg, end) {
-        var cards = _deck4.cards;
-        var len = cards.length;
-
-        ___fontSize = fontSize();
-        // deck.southCards = deck.southCards || [];
-        // deck.southCards.concat(cards.slice(beg, end))
-        cards.slice(beg, end).reverse().forEach(function (card, i) {
-          //console.log(`card is${card}`);
-          card.south(i, len, function (i) {
-            card.setSide('front');
-            if (i === 2) {
-              next();
-            }
-          });
-        });
-      }
-      _deck4.dealWestBidCards = _deck4.queued(dealWestBidCards);
-
-      function dealWestBidCards(next, beg, end) {
-        var cards = _deck4.cards;
-        var len = cards.length;
-
-        ___fontSize = fontSize();
-
-        cards.slice(beg, end).reverse().forEach(function (card, i) {
-          card.west(i, len, function (i) {
-            card.setSide('back');
-            if (i === 2) {
-              next();
-            }
-          });
-        });
-      }
-      _deck4.dealEastBidCards = _deck4.queued(dealEastBidCards);
-
-      function dealEastBidCards(next, beg, end) {
-        var cards = _deck4.cards;
-        var len = cards.length;
-
-        ___fontSize = fontSize();
-
-        cards.slice(beg, end).reverse().forEach(function (card, i) {
-          card.east(i, len, function (i) {
-            card.setSide('back');
-            if (i === 2) {
-              next();
-            }
-          });
-        });
-      }
     },
     card: function card(_card4) {
       var $el = _card4.$el;
 
-      _card4.dealBidCard = function (pos, i, len) {
-        return new Promise(function (resolve, reject) {
-          var delay = i * 250;
-          _card4.animateTo({
-            delay: delay,
-            duration: 250,
+      // card.dealBidCard = function (pos, i, len) {
+      //   return new Promise(function (resolve, reject) {
+      //     var delay = i * 250
+      //     card.animateTo({
+      //       delay: delay,
+      //       duration: 250,
 
-            y: pos.getY(i, ___fontSize), //Math.round((i - 1.05) * 20 * fontSize / 16),
-            x: pos.getX(i, ___fontSize), //Math.round(-150 * fontSize / 16),
-            rot: pos.rot,
-            onStart: function onStart() {
-              $el.style.zIndex = len - 1 + i;
-            },
-            onComplete: function onComplete() {
-              //cb(i)
-              resolve();
-            }
-          });
-        });
-      };
-      _card4.south = function (i, len, cb) {
-        var delay = i * 250;
-
-        _card4.animateTo({
-          delay: delay,
-          duration: 250,
-
-          x: Math.round((i - 1.05) * 20 * ___fontSize / 16),
-          y: Math.round(110 * ___fontSize / 16),
-          rot: 0,
-
-          onStart: function onStart() {
-            $el.style.zIndex = len - 1 + i;
-          },
-          onComplete: function onComplete() {
-            cb(i);
-          }
-        });
-      };
-      _card4.north = function (i, len, cb) {
-        var delay = i * 250;
-
-        _card4.animateTo({
-          delay: delay,
-          duration: 250,
-
-          x: Math.round((i - 1.05) * 20 * ___fontSize / 16),
-          y: Math.round(-110 * ___fontSize / 16),
-          rot: 0,
-
-          onStart: function onStart() {
-            $el.style.zIndex = len - 1 + i;
-          },
-          onComplete: function onComplete() {
-            cb(i);
-          }
-        });
-      };
-      _card4.west = function (i, len, cb) {
-        var delay = i * 250;
-
-        _card4.animateTo({
-          delay: delay,
-          duration: 250,
-
-          y: Math.round((i - 1.05) * 20 * ___fontSize / 16),
-          x: Math.round(-150 * ___fontSize / 16),
-          rot: 90,
-
-          onStart: function onStart() {
-            $el.style.zIndex = len - 1 + i;
-          },
-          onComplete: function onComplete() {
-            cb(i);
-          }
-        });
-      };
-      _card4.east = function (i, len, cb) {
-        var delay = i * 250;
-
-        _card4.animateTo({
-          delay: delay,
-          duration: 250,
-
-          y: Math.round((i - 1.05) * 20 * ___fontSize / 16),
-          x: Math.round(150 * ___fontSize / 16),
-          rot: 90,
-
-          onStart: function onStart() {
-            $el.style.zIndex = len - 1 + i;
-          },
-          onComplete: function onComplete() {
-            cb(i);
-          }
-        });
-      };
+      //       y: pos.getY(i, fontSize),//Math.round((i - 1.05) * 20 * fontSize / 16),
+      //       x: pos.getX(i, fontSize),//Math.round(-150 * fontSize / 16),
+      //       rot: pos.rot,
+      //       onStart: function () {
+      //         $el.style.zIndex = (len - 1) + i
+      //       },
+      //       onComplete: function () {
+      //         //cb(i)
+      //         resolve()
+      //       }
+      //     })
+      //   })
+      // }
     }
   };
 
