@@ -640,7 +640,7 @@ var Deck = (function () {
               return Math.round((idx - 1.95) * 10 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round(-150 * fs / 16);
+              return Math.round(-130 * fs / 16);
             },
             nextPosition: 'north',
             rot: 90,
@@ -654,7 +654,7 @@ var Deck = (function () {
               return Math.round(-130 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round((idx - 1.95) * 10 * fs / 16);
+              return Math.round((idx - 2.45) * 10 * fs / 16);
             },
             nextPosition: 'east',
             rot: 0,
@@ -668,7 +668,7 @@ var Deck = (function () {
               return Math.round((idx - 1.95) * 10 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round(150 * fs / 16);
+              return Math.round(130 * fs / 16);
             },
             nextPosition: 'south',
             rot: 90,
@@ -679,10 +679,10 @@ var Deck = (function () {
             endOne: -12,
             side: 'front',
             getY: function getY(idx, fs) {
-              return Math.round(130 * fs / 16);
+              return Math.round(180 * fs / 16);
             },
             getX: function getX(idx, fs) {
-              return Math.round((idx - 1.95) * 20 * fs / 16);
+              return Math.round((idx - 3.75) * 25 * fs / 16);
             },
             nextPosition: 'west',
             rot: 0,
@@ -698,6 +698,8 @@ var Deck = (function () {
           },
           start: function start(params) {
             return chooseDealer().then(function (data) {
+              return deal(3, 4);
+            }).then(function (data) {
               return deal(3, 4);
             }).then(function (data) {
               return deal(3, 4);
