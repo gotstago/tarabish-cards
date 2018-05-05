@@ -224,7 +224,7 @@ function printBidChoices(text) {
   $input1.setAttribute("name","radio")
   var $span1 = document.createElement('span')
   $span1.classList.add("checkmark")
-  $label.textContent = "Hearts"
+  $label1.textContent = "Hearts"
   $label1.appendChild($input1)
   $label1.appendChild($span1)
   $bidDiv.appendChild($label1)
