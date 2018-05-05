@@ -111,8 +111,10 @@ $tarabish.addEventListener('click', function playCards() {
   //deck.tarabish();
   // var len = cards.length
   deck.tarabish(0)
+  printBidChoices('')
   //console.log('here ...')
   deck.test(0)
+  
   // deck.dealSouthBidCards(-3,cards.length)
   // deck.dealWestBidCards(-6, -3)
   // deck.dealNorthBidCards(-9,-6)
@@ -190,6 +192,67 @@ function printMessage(text) {
     })
     .end(function () {
       document.body.removeChild($message)
+    })
+}
+/*
+<h1>Custom Radio Buttons</h1>
+<label class="bid">One
+  <input type="radio" checked="checked" name="radio">
+  <span class="checkmark"></span>
+</label>
+<label class="bid">Two
+  <input type="radio" name="radio">
+  <span class="checkmark"></span>
+</label>
+<label class="bid">Three
+  <input type="radio" name="radio">
+  <span class="checkmark"></span>
+</label>
+<label class="bid">Four
+  <input type="radio" name="radio">
+  <span class="checkmark"></span>
+</label>
+*/
+function printBidChoices(text) {
+  var animationFrames = Deck.animationFrames
+  var ease = Deck.ease
+  var $bidDiv = document.createElement('div')
+  var $label1 = document.createElement('label')
+  $label1.classList.add("bid");
+  var $input1 = document.createElement('input')
+  $input1.setAttribute("type","radio")
+  $input1.setAttribute("name","radio")
+  var $span1 = document.createElement('span')
+  $span1.classList.add("checkmark")
+  $label.textContent = "Hearts"
+  $label1.appendChild($input1)
+  $label1.appendChild($span1)
+  $bidDiv.appendChild($label1)
+  // $message.classList.add('message')
+  // $message.textContent = text
+
+  document.body.appendChild($bidDiv)
+
+  $bidDiv.style[transform] = translate(window.innerWidth + 'px', 0)
+
+  var diffX = window.innerWidth
+
+  animationFrames(1000, 700)
+    .progress(function (t) {
+      t = ease.cubicInOut(t)
+      $bidDiv.style[transform] = translate((diffX - diffX * t) + 'px', 0)
+    })
+
+  animationFrames(6000, 700)
+    .start(function () {
+      diffX = window.innerWidth
+    })
+    .progress(function (t) {
+      t = ease.cubicInOut(t)
+      $bidDiv.style[transform] = translate((-diffX * t) + 'px', 0)
+    })
+    .end(function () {
+      document.body.removeChild($bidDiv)
     })
 }
 
