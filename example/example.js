@@ -9,6 +9,7 @@ var translate = Deck.translate
 
 var $container = document.getElementById('container')
 var $topbar = document.getElementById('topbar')
+var $messagebar = document.getElementById('messagebar')
 
 var $sort = document.createElement('button')
 var $shuffle = document.createElement('button')
@@ -35,7 +36,7 @@ $topbar.appendChild($fan)
 $topbar.appendChild($poker)
 $topbar.appendChild($tarabish)
 $topbar.appendChild($sort)
-$topbar.appendChild($easter)
+// $topbar.appendChild($easter)
 
 var deck = Deck()
 
@@ -217,21 +218,15 @@ function printBidChoices(text) {
   var animationFrames = Deck.animationFrames
   var ease = Deck.ease
   var $bidDiv = document.createElement('div')
-  var $label1 = document.createElement('label')
-  $label1.classList.add("bid");
-  var $input1 = document.createElement('input')
-  $input1.setAttribute("type","radio")
-  $input1.setAttribute("name","radio")
-  var $span1 = document.createElement('span')
-  $span1.classList.add("checkmark")
-  $label1.textContent = "Hearts"
-  $label1.appendChild($input1)
-  $label1.appendChild($span1)
-  $bidDiv.appendChild($label1)
+  $bidDiv.appendChild(getSuit("\u2660"))
+  $bidDiv.appendChild(getSuit("\u2663"))
+  $bidDiv.appendChild(getSuit("\u2665"))
+  $bidDiv.appendChild(getSuit("\u2666"))
+  $bidDiv.appendChild(getSuit("Pass"))
   // $message.classList.add('message')
   // $message.textContent = text
 
-  document.body.appendChild($bidDiv)
+  $messagebar.appendChild($bidDiv)
 
   $bidDiv.style[transform] = translate(window.innerWidth + 'px', 0)
 
@@ -243,17 +238,38 @@ function printBidChoices(text) {
       $bidDiv.style[transform] = translate((diffX - diffX * t) + 'px', 0)
     })
 
-  animationFrames(6000, 700)
-    .start(function () {
-      diffX = window.innerWidth
-    })
-    .progress(function (t) {
-      t = ease.cubicInOut(t)
-      $bidDiv.style[transform] = translate((-diffX * t) + 'px', 0)
-    })
-    .end(function () {
-      document.body.removeChild($bidDiv)
-    })
+  // animationFrames(6000, 700)
+  //   .start(function () {
+  //     diffX = window.innerWidth
+  //   })
+  //   .progress(function (t) {
+  //     t = ease.cubicInOut(t)
+  //     $bidDiv.style[transform] = translate((diffX - diffX * t) + 'px', 0)
+  //   })
+  //   .end(function () {
+  //     //$messagebar.removeChild($bidDiv)
+  //   })
+}
+function getSuit(suit){
+  var label = document.createElement('label')
+  var suitMap = {
+    "\u2660":"spades",
+    "\u2663":"clubs",
+    "\u2665":"hearts",
+    "\u2666":"diamonds",
+    "Pass":"pass",
+  }
+  label.classList.add("bid");
+  label.classList.add(suitMap[suit]);
+  var input = document.createElement('input')
+  input.setAttribute("type","radio")
+  input.setAttribute("name","radio")
+  var span = document.createElement('span')
+  span.classList.add("checkmark")
+  label.textContent = suit
+  label.appendChild(input)
+  label.appendChild(span)  
+  return label
 }
 
 // easter eggs start

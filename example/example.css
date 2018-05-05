@@ -36,7 +36,7 @@
 
 /* When the radio button is checked, add a blue background */
 .bid input:checked ~ .checkmark {
-  background-color: #2196F3;
+  background-color: #2ED1A0;
 }
 
 /* Create the indicator (the dot/circle - hidden when not checked) */
@@ -103,6 +103,16 @@ body {
   background-color: #334d41;
   padding: 0.25rem;
   text-align: center;
+}
+#messagebar {
+  position: fixed;
+  top: 2.5rem;
+  left: 0;
+  width: 5.5rem;
+  background-color: #B2DBC8;
+  padding: 0.25rem;
+  text-align: center;
+  font-size: 0.5rem;
 }
 #topbar button {
   background: none;
