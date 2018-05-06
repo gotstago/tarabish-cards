@@ -630,6 +630,7 @@ var Deck = (function () {
         var currentPosition = undefined; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
         var dealCount = 0; //cards.length
+        var testMode;
         // return object with methods to manipulate closure scope
         var positions = {
           west: {
@@ -696,18 +697,54 @@ var Deck = (function () {
           getCurrent: function getCurrent() {
             return playerPositions[currentPosition];
           },
-          start: function start(params) {
+          start: function start() {
+            var testing = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+            testMode = testing;
             return chooseDealer().then(function (data) {
               return deal(3, 4);
             }).then(function (data) {
               return deal(3, 4);
             }).then(function (data) {
+              return acceptBids();
+            }).then(function (data) {
+              console.log('bid is ' + data);
               return deal(3, 4);
             }).then(function (data) {
               return 'finished game';
             });
           }
         };
+        function acceptBids() {
+          // return Promise.resolve(printBidChoices(''));
+          return new Promise(function (resolve, reject) {
+            console.log('first to bid is ' + playerPositions[currentPosition]);
+            console.log('dealer is ' + playerPositions[dealerPosition]);
+            if (playerPositions[currentPosition] === 'south') {
+              var messagebar = displayBidChoices('');
+              /**
+               * start bidding at current position
+               * if player is computer, bid in a naive way
+               * else display bid choices
+               */
+              messagebar.addEventListener("click", function () {
+                messagebar.hidden = true;
+                resolve();
+                // document.body.removeChild(bidDiv)
+              });
+            } else {
+                automaticBid(playerPositions[currentPosition]).then(function (data) {
+                  resolve(data);
+                });
+              }
+          });
+        }
+        function automaticBid(playerPosition) {
+          return new Promise(function (resolve, reject) {
+            var position = positions[playerPosition];
+            resolve('pass');
+          });
+        }
         function deal(amount) {
           var repeat = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
 
@@ -760,7 +797,8 @@ var Deck = (function () {
             //debugger
             var handSize = position.cards.length;
             console.log('handSize is ' + handSize);
-            var delay = 250; //handSize * 250//i * 250
+            var delay = testMode ? 0 : 250; //0 //handSize * 250//i * 250
+            var duration = testMode ? 25 : 250;
             var len = cards.length;
             console.log('currentPosition is ' + cp);
             var currentY = position.getY(handSize, ___fontSize);
@@ -769,7 +807,7 @@ var Deck = (function () {
             console.log('card is ' + card.rank + ' of ' + card.suit + ', handSize is ' + handSize + ', \n              currentY is ' + currentY + ' and currentX is ' + currentX);
             card.animateTo({
               delay: delay,
-              duration: 250,
+              duration: duration,
               y: currentY, //Math.round((i - 1.05) * 20 * fontSize / 16),
               x: currentX, //Math.round(-150 * fontSize / 16),
               rot: position.rot,
@@ -801,7 +839,7 @@ var Deck = (function () {
       function tarabish(next, dealer) {
         var rounds = [[-3, cards.length], [-6, -3], [-9, -6], [-12, -9]];
         var chain;
-        myGame.start().then(function (gameState) {
+        myGame.start(true).then(function (gameState) {
           console.log('Got the final result: ' + gameState);
           next();
         });

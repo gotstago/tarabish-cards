@@ -1,8 +1,9 @@
 .bid {
-  display: block;
+  display: inline;
   position: relative;
   padding-left: 35px;
-  margin-bottom: 12px;
+  padding-right: 15px;
+  /* margin-bottom: 12px; */
   cursor: pointer;
   font-size: 22px;
   -webkit-user-select: none;
@@ -61,6 +62,10 @@ border-radius: 50%;
 background: white;
 }
 
+.hearts, .diamonds {
+  color: red;
+}
+
 * {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -83,7 +88,7 @@ body {
   overflow: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  -moz-text-size-adjust: auto;
 }
 #container {
   position: fixed;
@@ -108,7 +113,7 @@ body {
   position: fixed;
   top: 2.5rem;
   left: 0;
-  width: 5.5rem;
+  width: 100%;
   background-color: #B2DBC8;
   padding: 0.25rem;
   text-align: center;

@@ -112,15 +112,15 @@ $tarabish.addEventListener('click', function playCards() {
   //deck.tarabish();
   // var len = cards.length
   deck.tarabish(0)
-  printBidChoices('')
+
   //console.log('here ...')
   deck.test(0)
-  
+
   // deck.dealSouthBidCards(-3,cards.length)
   // deck.dealWestBidCards(-6, -3)
   // deck.dealNorthBidCards(-9,-6)
   // deck.dealEastBidCards(-12, -9)
-  
+
 })
 
 deck.mount($container)
@@ -214,7 +214,7 @@ function printMessage(text) {
   <span class="checkmark"></span>
 </label>
 */
-function printBidChoices(text) {
+function displayBidChoices(text) {
   var animationFrames = Deck.animationFrames
   var ease = Deck.ease
   var $bidDiv = document.createElement('div')
@@ -227,7 +227,7 @@ function printBidChoices(text) {
   // $message.textContent = text
 
   $messagebar.appendChild($bidDiv)
-
+  $messagebar.hidden = false;
   $bidDiv.style[transform] = translate(window.innerWidth + 'px', 0)
 
   var diffX = window.innerWidth
@@ -237,7 +237,7 @@ function printBidChoices(text) {
       t = ease.cubicInOut(t)
       $bidDiv.style[transform] = translate((diffX - diffX * t) + 'px', 0)
     })
-
+  return $messagebar;
   // animationFrames(6000, 700)
   //   .start(function () {
   //     diffX = window.innerWidth
@@ -250,25 +250,28 @@ function printBidChoices(text) {
   //     //$messagebar.removeChild($bidDiv)
   //   })
 }
-function getSuit(suit){
+function getSuit(suit) {
   var label = document.createElement('label')
   var suitMap = {
-    "\u2660":"spades",
-    "\u2663":"clubs",
-    "\u2665":"hearts",
-    "\u2666":"diamonds",
-    "Pass":"pass",
+    "\u2660": { "class": "spades", "color": "black" },
+    "\u2663": { "class": "clubs", "color": "black" },
+    "\u2665": { "class": "hearts", "color": "red" },
+    "\u2666": { "class": "diamonds", "color": "red" },
+    "Pass": { "class": "pass" },
   }
   label.classList.add("bid");
-  label.classList.add(suitMap[suit]);
+  var character = suitMap[suit].class
+  //character.fontcolor(suitMap[suit].color)
+  label.classList.add(character);
+  //label.fontcolor(suitMap[suit].color)
   var input = document.createElement('input')
-  input.setAttribute("type","radio")
-  input.setAttribute("name","radio")
+  input.setAttribute("type", "radio")
+  input.setAttribute("name", "radio")
   var span = document.createElement('span')
   span.classList.add("checkmark")
   label.textContent = suit
   label.appendChild(input)
-  label.appendChild(span)  
+  label.appendChild(span)
   return label
 }
 
