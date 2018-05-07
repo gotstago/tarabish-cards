@@ -629,8 +629,47 @@ var Deck = (function () {
         var dealerPosition; // = 'south';
         var currentPosition = undefined; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
+        var cardValues = {
+          "1": {
+            "nonTrump": 11,
+            "trump": 11
+          },
+          "6": {
+            "nonTrump": 0,
+            "trump": 0
+          },
+          "7": {
+            "nonTrump": 0,
+            "trump": 0
+          },
+          "8": {
+            "nonTrump": 0,
+            "trump": 0
+          },
+          "9": {
+            "nonTrump": 0,
+            "trump": 14
+          },
+          "10": {
+            "nonTrump": 10,
+            "trump": 10
+          },
+          "11": {
+            "nonTrump": 2,
+            "trump": 20
+          },
+          "12": {
+            "nonTrump": 3,
+            "trump": 3
+          },
+          "13": {
+            "nonTrump": 4,
+            "trump": 4
+          }
+        };
         var dealCount = 0; //cards.length
         var testMode;
+
         // return object with methods to manipulate closure scope
         var positions = {
           west: {
@@ -707,10 +746,12 @@ var Deck = (function () {
               return deal(3, 4);
             }).then(function (data) {
               return acceptBids();
-            }).then(function (data) {
-              console.log('bid is ' + data);
-              return deal(3, 4);
-            }).then(function (data) {
+            })
+            // .then(data => {
+            //   console.log(`bid is ${data}`)
+            //   return deal(3, 4)
+            // })
+            .then(function (data) {
               return 'finished game';
             });
           }
@@ -742,8 +783,19 @@ var Deck = (function () {
         function automaticBid(playerPosition) {
           return new Promise(function (resolve, reject) {
             var position = positions[playerPosition];
+            position.cards.forEach(function (card) {
+              console.log('card is ' + card.rank + ' of ' + card.suit);
+            });
+            evaluateCards(position.cards);
             resolve('pass');
           });
+        }
+        function evaluateCards(hand) {
+          var valueMap = hand.filter(function (c) {
+            console.log('suit is ' + c.suit);
+            return c.suit === 0;
+          });
+          console.log('valueMap is ' + valueMap);
         }
         function deal(amount) {
           var repeat = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
