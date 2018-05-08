@@ -629,6 +629,8 @@ var Deck = (function () {
         var dealerPosition; // = 'south';
         var currentPosition = undefined; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
+        var suits = ['spades', 'hearts', 'clubs', 'diamonds'];
+        var cardSuits = [];
         var cardValues = {
           "1": {
             "nonTrump": 11,
@@ -775,6 +777,7 @@ var Deck = (function () {
               });
             } else {
                 automaticBid(playerPositions[currentPosition]).then(function (data) {
+                  console.log('bid is ' + data);
                   resolve(data);
                 });
               }
@@ -786,16 +789,99 @@ var Deck = (function () {
             position.cards.forEach(function (card) {
               console.log('card is ' + card.rank + ' of ' + card.suit);
             });
-            evaluateCards(position.cards);
-            resolve('pass');
+            var bid = evaluateCards(position.cards);
+
+            resolve(bid);
           });
         }
         function evaluateCards(hand) {
-          var valueMap = hand.filter(function (c) {
-            console.log('suit is ' + c.suit);
-            return c.suit === 0;
+          var trumpReducer = function trumpReducer(accumulator, currentValue) {
+            return accumulator + cardValues[currentValue.rank.toString()].trump;
+          };
+          var nonTrumpReducer = function nonTrumpReducer(accumulator, currentValue) {
+            return accumulator + cardValues[currentValue.rank.toString()].nonTrump;
+          };
+          var scenarios = [0, 1, 2, 3].map(function (currentTrump) {
+            // return {
+            return [hand.filter(function (c) {
+              return c.suit === 0;
+            }), hand.filter(function (c) {
+              return c.suit === 1;
+            }), hand.filter(function (c) {
+              return c.suit === 2;
+            }), hand.filter(function (c) {
+              return c.suit === 3;
+            })].map(function (val) {
+              return val.reduce(function (prev, curr, index) {
+                if (curr.suit === currentTrump) {
+                  return prev + cardValues[curr.rank.toString()].trump;
+                } else {
+                  return prev + cardValues[curr.rank.toString()].nonTrump;
+                }
+              }, 0);
+            }).reduce(function (prev, curr) {
+              return prev + curr;
+            }, 0);
+            // currentTrump:currentTrump,
+            // pointTotal:calculateTotals(hand,currentTrump)
+            // }
           });
-          console.log('valueMap is ' + valueMap);
+          var indexOfMaxValue = scenarios.reduce(function (iMax, x, i, arr) {
+            return x > arr[iMax] ? i : iMax;
+          }, 0);
+          console.log(scenarios);
+          console.log(indexOfMaxValue); //Math.max( ...scenarios )
+          if (scenarios[indexOfMaxValue] > 34) {
+            return suits[indexOfMaxValue];
+          } else {
+            return 'pass';
+          }
+          //return scenarios[indexOfMaxValue]
+          // var spadeList = hand.filter(function (c) {
+          //   //console.log(`suit is ${c.suit}`)
+          //   return c.suit === 0
+          // })
+          // console.log(`spadeList has a trump value of ${spadeList.reduce(trumpReducer, 0)}`)
+          // console.log(`spadeList has a non-trump value of ${spadeList.reduce(nonTrumpReducer, 0)}`)
+          // var heartList = hand.filter(function (c) {
+          //   //console.log(`suit is ${c.suit}`)
+          //   return c.suit === 1
+          // })
+          // console.log(`heartList is ${heartList}`)
+          // var clubList = hand.filter(function (c) {
+          //   //console.log(`suit is ${c.suit}`)
+          //   return c.suit === 2
+          // })
+          // console.log(`clubList is ${clubList}`)
+          // var diamondList = hand.filter(function (c) {
+          //   //console.log(`suit is ${c.suit}`)
+          //   return c.suit === 3
+          // })
+          // console.log(`diamondList is ${diamondList}`)
+        }
+        function calculateTotals(hand, trump) {
+          var possibleTrumpScenarios = [hand.filter(function (c) {
+            return c.suit === 0;
+          }), hand.filter(function (c) {
+            return c.suit === 1;
+          }), hand.filter(function (c) {
+            return c.suit === 2;
+          }), hand.filter(function (c) {
+            return c.suit === 3;
+          })].map(function (val) {
+            return val.reduce(function (prev, curr) {
+              if (curr.suit === trump) {
+                return prev + cardValues[curr.rank.toString()].trump;
+              } else {
+                return prev + cardValues[curr.rank.toString()].nonTrump;
+              }
+            }, 0);
+          }).reduce(function (prev, curr) {
+            return prev + curr;
+          }, 0);
+          //trump.map(function (value) {
+          return possibleTrumpScenarios;
+          //})
         }
         function deal(amount) {
           var repeat = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
