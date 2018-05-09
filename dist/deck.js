@@ -627,10 +627,13 @@ var Deck = (function () {
         // set up closure scope
         // var state = 1;
         var dealerPosition; // = 'south';
-        var currentPosition = undefined; // = 'west';
+        var currentPosition = undefined,
+            handTrump = undefined,
+            handBidder = undefined; // = 'west';
         var playerPositions = ["west", "north", "east", "south"];
         var suits = ['spades', 'hearts', 'clubs', 'diamonds'];
         var cardSuits = [];
+
         var cardValues = {
           "1": {
             "nonTrump": 11,
@@ -748,13 +751,11 @@ var Deck = (function () {
               return deal(3, 4);
             }).then(function (data) {
               return acceptBids();
-            })
-            // .then(data => {
-            //   console.log(`bid is ${data}`)
-            //   return deal(3, 4)
-            // })
-            .then(function (data) {
-              return 'finished game';
+            }).then(function (data) {
+              console.log('bid is ' + data);
+              return deal(3, 4);
+            }).then(function (data) {
+              return 'finished deal, trump is ' + handTrump + ', bid by ' + handBidder;
             });
           }
         };
@@ -784,11 +785,13 @@ var Deck = (function () {
           //   }
           // })
           return automaticBid(playerPositions[currentPosition]).then(handler).then(handler).then(handler)['catch'](function (data) {
+            handTrump = data;
             console.log('bid is resolved');
             return Promise.resolve(data);
           });
         }
         function handler(data) {
+          handBidder = playerPositions[currentPosition];
           console.log('bid is ' + playerPositions[currentPosition] + ', ' + data);
           currentPosition = (currentPosition + 1) % 4;
           if (data === 'pass') {
