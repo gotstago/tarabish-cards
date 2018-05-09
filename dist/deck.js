@@ -760,28 +760,43 @@ var Deck = (function () {
         };
         function acceptBids() {
           // return Promise.resolve(printBidChoices(''));
-          return new Promise(function (resolve, reject) {
-            console.log('first to bid is ' + playerPositions[currentPosition]);
-            console.log('dealer is ' + playerPositions[dealerPosition]);
-            if (playerPositions[currentPosition] === 'south') {
-              var messagebar = displayBidChoices('');
-              /**
-               * start bidding at current position
-               * if player is computer, bid in a naive way
-               * else display bid choices
-               */
-              messagebar.addEventListener("click", function () {
-                messagebar.hidden = true;
-                resolve();
-                // document.body.removeChild(bidDiv)
-              });
-            } else {
-                automaticBid(playerPositions[currentPosition]).then(function (data) {
-                  console.log('bid is ' + data);
-                  resolve(data);
-                });
-              }
+          // return new Promise(function (resolve, reject) {
+          //   console.log(`first to bid is ${playerPositions[currentPosition]}`)
+          //   console.log(`dealer is ${playerPositions[dealerPosition]}`)
+          //   if (playerPositions[currentPosition] === 'south') {
+          //     var messagebar = displayBidChoices('');
+          //     /**
+          //      * start bidding at current position
+          //      * if player is computer, bid in a naive way
+          //      * else display bid choices
+          //      */
+          //     messagebar.addEventListener("click", function () {
+          //       messagebar.hidden = true;
+          //       resolve();
+          //       // document.body.removeChild(bidDiv)
+          //     })
+          //   } else {
+          //     automaticBid(playerPositions[currentPosition])
+          //       .then(data => {
+          //         console.log(`bid is ${data}`)
+          //         return resolve(data)
+          //       })
+          //   }
+          // })
+          return automaticBid(playerPositions[currentPosition]).then(handler).then(handler).then(handler)['catch'](function (data) {
+            console.log('bid is resolved');
+            return Promise.resolve(data);
           });
+        }
+        function handler(data) {
+          console.log('bid is ' + playerPositions[currentPosition] + ', ' + data);
+          currentPosition = (currentPosition + 1) % 4;
+          if (data === 'pass') {
+            console.log('bid is not resolved');
+            return automaticBid(playerPositions[currentPosition]);
+          } else {
+            return Promise.reject(data);
+          }
         }
         function automaticBid(playerPosition) {
           return new Promise(function (resolve, reject) {
@@ -791,7 +806,7 @@ var Deck = (function () {
             });
             var bid = evaluateCards(position.cards);
 
-            resolve(bid);
+            return resolve(bid);
           });
         }
         function evaluateCards(hand) {
