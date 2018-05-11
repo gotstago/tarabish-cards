@@ -753,44 +753,120 @@ var Deck = (function () {
               return acceptBids();
             }).then(function (data) {
               console.log('bid is ' + data);
-              return deal(3, 4);
-            }).then(function (data) {
+              return sortSouth();
+            })
+            // .then(data => {
+            //   console.log(`bid is ${data}`)
+            //   return deal(3, 4)
+            // })
+            .then(function (data) {
               return 'finished deal, trump is ' + handTrump + ', bid by ' + handBidder;
             });
           }
         };
-        function acceptBids() {
-          // return Promise.resolve(printBidChoices(''));
-          // return new Promise(function (resolve, reject) {
-          //   console.log(`first to bid is ${playerPositions[currentPosition]}`)
-          //   console.log(`dealer is ${playerPositions[dealerPosition]}`)
-          //   if (playerPositions[currentPosition] === 'south') {
-          //     var messagebar = displayBidChoices('');
-          //     /**
-          //      * start bidding at current position
-          //      * if player is computer, bid in a naive way
-          //      * else display bid choices
-          //      */
-          //     messagebar.addEventListener("click", function () {
-          //       messagebar.hidden = true;
-          //       resolve();
-          //       // document.body.removeChild(bidDiv)
-          //     })
-          //   } else {
-          //     automaticBid(playerPositions[currentPosition])
-          //       .then(data => {
-          //         console.log(`bid is ${data}`)
-          //         return resolve(data)
-          //       })
+
+        function sortSouth(reverse) {
+          var southCards = positions.south.cards;
+          positions.south.cards = [];
+          southCards.sort(function (a, b) {
+            if (reverse) {
+              return a.i - b.i;
+            } else {
+              return b.i - a.i;
+            }
+          });
+          var chain = Promise.resolve();
+          southCards.forEach(function (currentCard, i) {
+            (function (cp) {
+              chain = chain.then(function () {
+                return dealCard(cp, currentCard, i);
+              });
+              // do your stuff here
+              // use the index variable - it is assigned to the value of 'i'
+              // that was passed in during the loop iteration.
+            })(3); // south Position
+            //   // if (i === southCards.length - 1) {
+            //   //   next()-
+            //   // }
+            // }, reverse)
+          });
+          return chain;
+        }
+
+        function moveCard(i, len, cb, reverse) {
+          // var z = i / 4
+          // var delay = i * 10
+
+          // card.animateTo({
+          //   delay: delay,
+          //   duration: 400,
+
+          //   x: -z,
+          //   y: -150,
+          //   rot: 0,
+
+          //   onComplete: function () {
+          //     $el.style.zIndex = i
           //   }
           // })
-          return automaticBid(playerPositions[currentPosition]).then(handler).then(handler).then(handler)['catch'](function (data) {
+
+          // card.animateTo({
+          //   delay: delay + 500,
+          //   duration: 400,
+
+          //   x: -z,
+          //   y: -z,
+          //   rot: 0,
+
+          //   onComplete: function () {
+          //     cb(i)
+          //   }
+          // })
+        }
+        function dealCard(cp, card, i) {
+          return new Promise(function (resolve, reject) {
+            //console.log(`deal card ${card} to ${position.nextPosition}`)
+            var position = positions[playerPositions[cp]];
+            console.log('position is ' + position.nextPosition);
+            //debugger
+            var handSize = position.cards.length;
+            console.log('handSize is ' + handSize);
+            var delay = testMode ? 0 : 250; //0 //handSize * 250//i * 250
+            var duration = testMode ? 25 : 250;
+            var len = cards.length;
+            console.log('currentPosition is ' + cp);
+            var currentY = position.getY(handSize, ___fontSize);
+            var currentX = position.getX(handSize, ___fontSize);
+            ___fontSize = fontSize();
+            console.log('card is ' + card.rank + ' of ' + card.suit + ', handSize is ' + handSize + ', \n              currentY is ' + currentY + ' and currentX is ' + currentX);
+            card.animateTo({
+              delay: delay,
+              duration: duration,
+              y: currentY, //Math.round((i - 1.05) * 20 * fontSize / 16),
+              x: currentX, //Math.round(-150 * fontSize / 16),
+              rot: position.rot,
+              onStart: function onStart() {
+                card.$el.style.zIndex = len - 1 + handSize;
+              },
+              onComplete: function onComplete() {
+                card.setSide(position.side);
+                position.cards.push(card);
+                dealCount++;
+                resolve();
+              }
+            });
+          });
+        }
+
+        function acceptBids() {
+          return automaticBid(playerPositions[currentPosition]).then(automaticBidHandler).then(automaticBidHandler).then(automaticBidHandler)['catch'](function (data) {
             handTrump = data;
             console.log('bid is resolved');
             return Promise.resolve(data);
           });
         }
-        function handler(data) {
+        function automaticBidHandler(data) {
+          //check for a bid other than pass, and if found,we are finished bidding.
           handBidder = playerPositions[currentPosition];
           console.log('bid is ' + playerPositions[currentPosition] + ', ' + data);
           currentPosition = (currentPosition + 1) % 4;
@@ -854,28 +930,6 @@ var Deck = (function () {
           } else {
             return 'pass';
           }
-          //return scenarios[indexOfMaxValue]
-          // var spadeList = hand.filter(function (c) {
-          //   //console.log(`suit is ${c.suit}`)
-          //   return c.suit === 0
-          // })
-          // console.log(`spadeList has a trump value of ${spadeList.reduce(trumpReducer, 0)}`)
-          // console.log(`spadeList has a non-trump value of ${spadeList.reduce(nonTrumpReducer, 0)}`)
-          // var heartList = hand.filter(function (c) {
-          //   //console.log(`suit is ${c.suit}`)
-          //   return c.suit === 1
-          // })
-          // console.log(`heartList is ${heartList}`)
-          // var clubList = hand.filter(function (c) {
-          //   //console.log(`suit is ${c.suit}`)
-          //   return c.suit === 2
-          // })
-          // console.log(`clubList is ${clubList}`)
-          // var diamondList = hand.filter(function (c) {
-          //   //console.log(`suit is ${c.suit}`)
-          //   return c.suit === 3
-          // })
-          // console.log(`diamondList is ${diamondList}`)
         }
         function calculateTotals(hand, trump) {
           var possibleTrumpScenarios = [hand.filter(function (c) {
@@ -927,7 +981,7 @@ var Deck = (function () {
               //let cp = currentPosition
               (function (cp) {
                 chain = chain.then(function () {
-                  return dealBidCard(cp, currentCard, amountIndex);
+                  return dealCard(cp, currentCard, amountIndex);
                 });
                 // do your stuff here
                 // use the index variable - it is assigned to the value of 'i'
@@ -945,7 +999,7 @@ var Deck = (function () {
           //console.log(`cardsToDeal are ${cardsToDeal.length}`)
           return chain;
         }
-        function dealBidCard(cp, card, i) {
+        function dealCard(cp, card, i) {
           return new Promise(function (resolve, reject) {
             //console.log(`deal card ${card} to ${position.nextPosition}`)
             var position = positions[playerPositions[cp]];
